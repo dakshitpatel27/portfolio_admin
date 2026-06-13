@@ -92,6 +92,11 @@ app.get('/api/status', (req, res) => {
   res.json({ success: true, online: true });
 });
 
+// Route for clean admin URL
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin.html'));
+});
+
 // Redirect any unknown route back to index.html
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
