@@ -198,7 +198,7 @@
       <footer class="footer">
         <p class="footer-text">
           © 2026 Dakshit Gajipara. All rights reserved.
-          <a href="admin" target="_blank" style="color: inherit; margin-left: 8px; opacity: 0.15; transition: opacity 0.3s; display: inline-flex; align-items: center; vertical-align: middle;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.15" title="Admin Panel">
+          <a href="admin.html" target="_blank" style="color: inherit; margin-left: 8px; opacity: 0.15; transition: opacity 0.3s; display: inline-flex; align-items: center; vertical-align: middle;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.15" title="Admin Panel">
             <ion-icon name="lock-closed-outline"></ion-icon>
           </a>
         </p>
@@ -212,6 +212,46 @@
     </div>
 
   </main>
+
+  <!-- Floating Chatbot Toggle Button -->
+  <button class="chatbot-toggle-btn" id="chatbot-toggle" title="Chat with Dakshit's Assistant">
+    <ion-icon name="chatbubbles-outline"></ion-icon>
+    <span class="chatbot-notification">1</span>
+  </button>
+
+  <!-- Chatbot Window -->
+  <div class="chatbot-window" id="chatbot-window">
+    <div class="chatbot-header">
+      <div class="chatbot-title-area">
+        <div class="chatbot-avatar">
+          <ion-icon name="hardware-chip-outline"></ion-icon>
+        </div>
+        <div>
+          <h4 class="chatbot-title">Chat Bot</h4>
+          <span class="chatbot-subtitle">Online • Ask about me</span>
+        </div>
+      </div>
+      <button class="chatbot-close-btn" id="chatbot-close" title="Close Chat">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <div class="chatbot-messages" id="chatbot-messages">
+      <!-- Dynamic Messages Rendered Here -->
+    </div>
+
+    <!-- Quick Suggestions Container -->
+    <div class="chatbot-suggestions" id="chatbot-suggestions">
+      <!-- Dynamic Chips Rendered Here -->
+    </div>
+
+    <div class="chatbot-input-area">
+      <input type="text" id="chatbot-input" placeholder="Type a message..." autocomplete="off">
+      <button id="chatbot-send" title="Send message">
+        <ion-icon name="paper-plane-outline"></ion-icon>
+      </button>
+    </div>
+  </div>
 
   <!-- Success Toast Notification -->
   <div id="toast" class="toast">
@@ -232,6 +272,7 @@
   <script src="config.js"></script>
   <script src="data.js"></script>
   <script src="script.js"></script>
+  <script src="chatbot.js"></script>
 
   <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>

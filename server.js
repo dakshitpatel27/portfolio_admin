@@ -11,9 +11,9 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Prevent caching of configuration and data files
+// Prevent caching of configuration, data, stylesheet, and javascript files
 app.use((req, res, next) => {
-  if (req.url.includes('config.js') || req.url.includes('data.js')) {
+  if (req.url.includes('config.js') || req.url.includes('data.js') || req.url.includes('style.css') || req.url.includes('script.js')) {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
   }
   next();

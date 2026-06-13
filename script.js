@@ -5,12 +5,224 @@ if (window.location.search) {
   const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + window.location.hash;
   window.history.replaceState({ path: cleanUrl }, '', cleanUrl);
 }
+// Theme Customization Engine
+function applyTheme(theme) {
+  if (!theme) return;
+
+  const mode = theme.mode || 'dark';
+  const preset = theme.preset || 'default';
+  const accentColor = theme.accentColor || '#ffdb70';
+  const primaryColor = theme.primaryColor || '#090a0f';
+  const fontFamily = theme.fontFamily || 'Poppins';
+
+  // 1. Load chosen Google Font
+  loadGoogleFont(fontFamily);
+
+  // 2. Map theme colors based on preset and mode
+  let actualAccent = accentColor;
+  let actualBg = primaryColor;
+  let actualCardBg = 'rgba(15, 23, 42, 0.65)';
+  let actualInnerBg = '#0b0c10';
+  let actualBorder = '#1e293b';
+  let actualOnyx = '#334155';
+  let actualWhite1 = '#ffffff';
+  let actualWhite2 = '#f1f5f9';
+  let actualLightGray = '#cbd5e1';
+  let actualLightGray70 = 'rgba(203, 213, 225, 0.7)';
+
+  if (preset === 'default') {
+    actualAccent = '#ffdb70';
+    actualBg = '#090a0f';
+  } else if (preset === 'obsidian') {
+    actualAccent = '#38bdf8';
+    actualBg = '#030712';
+  } else if (preset === 'emerald') {
+    actualAccent = '#34d399';
+    actualBg = '#022c22';
+  } else if (preset === 'sunset') {
+    actualAccent = '#f97316';
+    actualBg = '#0f0502';
+  } else if (preset === 'lavender') {
+    actualAccent = '#c084fc';
+    actualBg = '#0b0514';
+  } else if (preset === 'cyberpunk') {
+    actualAccent = '#f43f5e';
+    actualBg = '#090514';
+  }
+
+  if (mode === 'light') {
+    actualAccent = adjustColorBrightness(actualAccent, -25);
+    actualBg = (preset === 'default' ? '#f8fafc' : (preset === 'custom' ? actualBg : getLightBgForPreset(preset)));
+    actualCardBg = 'rgba(255, 255, 255, 0.8)';
+    actualInnerBg = '#ffffff';
+    actualBorder = '#e2e8f0';
+    actualOnyx = '#cbd5e1';
+    actualWhite1 = '#0f172a';
+    actualWhite2 = '#1e293b';
+    actualLightGray = '#475569';
+    actualLightGray70 = 'rgba(71, 85, 105, 0.8)';
+  } else {
+    if (preset !== 'default' && preset !== 'custom') {
+      actualBg = getDarkBgForPreset(preset);
+    }
+  }
+
+  const accentRgb = hexToRgb(actualAccent);
+  const root = document.documentElement;
+
+  root.style.setProperty('--smoky-black', actualBg);
+  root.style.setProperty('--eerie-black-2', actualCardBg);
+  root.style.setProperty('--eerie-black-1', actualInnerBg);
+  root.style.setProperty('--jet', actualBorder);
+  root.style.setProperty('--onyx', actualOnyx);
+  root.style.setProperty('--white-1', actualWhite1);
+  root.style.setProperty('--white-2', actualWhite2);
+  root.style.setProperty('--light-gray', actualLightGray);
+  root.style.setProperty('--light-gray-70', actualLightGray70);
+  root.style.setProperty('--orange-yellow-crayola', actualAccent);
+  root.style.setProperty('--vegas-gold', actualAccent);
+  root.style.setProperty('--ff-poppins', `'${fontFamily}', sans-serif`);
+
+  root.style.setProperty('--text-gradient-yellow', `linear-gradient(to right, ${actualAccent}, ${adjustColorBrightness(actualAccent, -20)})`);
+  root.style.setProperty('--bg-gradient-yellow-1', `linear-gradient(to bottom right, ${actualAccent} 0%, rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0) 50%)`);
+  root.style.setProperty('--bg-gradient-yellow-2', `linear-gradient(135deg, rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.25) 0%, rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0) 59.86%), ${actualBg}`);
+  
+  if (mode === 'light') {
+    root.style.setProperty('--bg-gradient-onyx', `linear-gradient(to bottom right, #ffffff 3%, #f1f5f9 97%)`);
+    root.style.setProperty('--bg-gradient-jet', `linear-gradient(to bottom right, rgba(255, 255, 255, 0.4) 0%, rgba(241, 245, 249, 0) 100%), #ffffff`);
+    root.style.setProperty('--border-gradient-onyx', `linear-gradient(to bottom right, rgba(15, 23, 42, 0.12) 0%, rgba(15, 23, 42, 0) 50%)`);
+  } else {
+    root.style.setProperty('--bg-gradient-onyx', `linear-gradient(to bottom right, ${adjustColorBrightness(actualBg, 10)} 3%, ${actualBg} 97%)`);
+    root.style.setProperty('--bg-gradient-jet', `linear-gradient(to bottom right, rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.1) 0%, rgba(15, 23, 42, 0) 100%), ${adjustColorBrightness(actualBg, 5)}`);
+    root.style.setProperty('--border-gradient-onyx', `linear-gradient(to bottom right, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 50%)`);
+  }
+
+  // Set navbar dynamic colors
+  let navbarBg = actualCardBg;
+  let navbarBorder = actualBorder;
+  let navbarLinkHoverBg = 'rgba(255, 255, 255, 0.05)';
+  let navbarLinkActiveBg = 'var(--bg-gradient-jet)';
+  let navbarLinkActiveColor = actualAccent;
+  let navbarLinkActiveBorder = actualAccent;
+
+  if (mode === 'light') {
+    navbarBg = 'rgba(255, 255, 255, 0.85)';
+    navbarBorder = '#cbd5e1';
+    navbarLinkHoverBg = 'rgba(0, 0, 0, 0.05)';
+    navbarLinkActiveBg = `rgba(${accentRgb.r}, ${accentRgb.g}, ${accentRgb.b}, 0.15)`;
+    navbarLinkActiveColor = actualAccent;
+    navbarLinkActiveBorder = actualAccent;
+  }
+
+  root.style.setProperty('--navbar-bg', navbarBg);
+  root.style.setProperty('--navbar-border', navbarBorder);
+  root.style.setProperty('--navbar-link-hover-bg', navbarLinkHoverBg);
+  root.style.setProperty('--navbar-link-active-bg', navbarLinkActiveBg);
+  root.style.setProperty('--navbar-link-active-color', navbarLinkActiveColor);
+  root.style.setProperty('--navbar-link-active-border', navbarLinkActiveBorder);
+
+  // Set chatbot dynamic user text contrast color
+  const chatbotUserText = mode === 'light' ? '#ffffff' : '#0b0c10';
+  root.style.setProperty('--chatbot-user-text', chatbotUserText);
+
+  // Show/Hide Chatbot based on configuration
+  const chatbotToggle = document.getElementById('chatbot-toggle');
+  const chatbotWindow = document.getElementById('chatbot-window');
+  if (chatbotToggle) {
+    if (theme.chatbotEnabled === false) {
+      chatbotToggle.style.setProperty('display', 'none', 'important');
+      if (chatbotWindow) {
+        chatbotWindow.classList.remove('active');
+        chatbotWindow.style.setProperty('display', 'none', 'important');
+      }
+    } else {
+      chatbotToggle.style.removeProperty('display');
+      if (chatbotWindow) {
+        chatbotWindow.style.removeProperty('display');
+      }
+    }
+  }
+
+  // 3. Update the 3D background colors
+  if (window.updateThreeBgTheme) {
+    window.updateThreeBgTheme(actualAccent, actualBg, mode);
+  }
+}
+
+function getDarkBgForPreset(preset) {
+  switch(preset) {
+    case 'obsidian': return '#030712';
+    case 'emerald': return '#022c22';
+    case 'sunset': return '#0f0502';
+    case 'lavender': return '#0b0514';
+    case 'cyberpunk': return '#090514';
+    default: return '#090a0f';
+  }
+}
+
+function getLightBgForPreset(preset) {
+  switch(preset) {
+    case 'obsidian': return '#f0f9ff';
+    case 'emerald': return '#f0fdf4';
+    case 'sunset': return '#fff7ed';
+    case 'lavender': return '#faf5ff';
+    case 'cyberpunk': return '#fff1f2';
+    default: return '#f8fafc';
+  }
+}
+
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 255, g: 219, b: 112 };
+}
+
+function loadGoogleFont(fontName) {
+  const fontId = 'dynamic-google-font';
+  let link = document.getElementById(fontId);
+  if (!link) {
+    link = document.createElement('link');
+    link.id = fontId;
+    link.rel = 'stylesheet';
+    document.head.appendChild(link);
+  }
+  const formattedName = fontName.replace(/\s+/g, '+');
+  link.href = `https://fonts.googleapis.com/css2?family=${formattedName}:wght@300;400;500;600;700&display=swap`;
+}
+
+function adjustColorBrightness(hex, percent) {
+  let R = parseInt(hex.substring(1, 3), 16);
+  let G = parseInt(hex.substring(3, 5), 16);
+  let B = parseInt(hex.substring(5, 7), 16);
+
+  R = parseInt(R * (100 + percent) / 100);
+  G = parseInt(G * (100 + percent) / 100);
+  B = parseInt(B * (100 + percent) / 100);
+
+  R = Math.min(255, Math.max(0, R));
+  G = Math.min(255, Math.max(0, G));
+  B = Math.min(255, Math.max(0, B));
+
+  const rHex = R.toString(16).padStart(2, '0');
+  const gHex = G.toString(16).padStart(2, '0');
+  const bHex = B.toString(16).padStart(2, '0');
+
+  return `#${rHex}${gHex}${bHex}`;
+}
 
 // Function to render all sections from the window.portfolioData object
 function renderPortfolio(data) {
   if (!data) {
     console.error("No portfolio data found!");
     return;
+  }
+
+  // Apply Theme configuration if available
+  if (data.theme) {
+    applyTheme(data.theme);
   }
 
   // Render Profile / Sidebar
@@ -345,7 +557,7 @@ function showPage(targetName) {
 }
 
 function initDynamicTilt() {
-  const cards = document.querySelectorAll('.project-item:not(.tilt-initialized), .service-item:not(.tilt-initialized), .footer:not(.tilt-initialized)');
+  const cards = document.querySelectorAll('.project-item:not(.tilt-initialized), .service-item:not(.tilt-initialized)');
   
   if (window.innerWidth > 768) {
     cards.forEach(card => {

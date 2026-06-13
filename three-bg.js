@@ -199,6 +199,50 @@
     }
   };
 
+  window.updateThreeBgTheme = function (accentHex, bgHex, mode) {
+    if (!scene) return;
+    
+    function adjustColorBrightness(hex, percent) {
+      let R = parseInt(hex.substring(1, 3), 16);
+      let G = parseInt(hex.substring(3, 5), 16);
+      let B = parseInt(hex.substring(5, 7), 16);
+      R = parseInt(R * (100 + percent) / 100);
+      G = parseInt(G * (100 + percent) / 100);
+      B = parseInt(B * (100 + percent) / 100);
+      R = Math.min(255, Math.max(0, R));
+      G = Math.min(255, Math.max(0, G));
+      B = Math.min(255, Math.max(0, B));
+      return `#${R.toString(16).padStart(2, '0')}${G.toString(16).padStart(2, '0')}${B.toString(16).padStart(2, '0')}`;
+    }
+
+    const primaryAccent = new THREE.Color(accentHex);
+    const secondaryAccent = new THREE.Color(adjustColorBrightness(accentHex, -25));
+    const lightAccent = new THREE.Color(adjustColorBrightness(accentHex, 25));
+    const particleColorsList = [
+      primaryAccent,
+      secondaryAccent,
+      lightAccent,
+      new THREE.Color(mode === 'light' ? '#334155' : '#ffffff'),
+      new THREE.Color(mode === 'light' ? '#475569' : '#cbd5e1')
+    ];
+
+    const fogColorHex = mode === 'light' ? '#f8fafc' : bgHex;
+    const isHexVal = /^#[0-9A-F]{6}$/i.test(fogColorHex);
+    const resolvedFogColor = isHexVal ? fogColorHex : (mode === 'light' ? '#f8fafc' : '#090a0f');
+
+    scene.fog.color.set(resolvedFogColor);
+    if (renderer) {
+      renderer.setClearColor(resolvedFogColor, 0);
+    }
+
+    for (let i = 0; i < maxParticles; i++) {
+      const p = particles[i];
+      if (!p) continue;
+      const newColor = particleColorsList[i % particleColorsList.length];
+      p.color = newColor;
+    }
+  };
+
   function render() {
     // Parallax effect: camera target moves based on mouse
     targetX = mouseX * 80;

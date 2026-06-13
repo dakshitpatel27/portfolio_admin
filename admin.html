@@ -802,6 +802,56 @@
         width: 100%;
       }
     }
+
+    /* Toggle Switch Styles */
+    .switch-container {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch-container input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .switch-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--smoky-black);
+      border: 1px solid var(--jet);
+      transition: .3s;
+      border-radius: 34px;
+    }
+
+    .switch-slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--white-1);
+      transition: .3s;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    input:checked + .switch-slider {
+      background-color: var(--orange-yellow-crayola);
+      border-color: var(--orange-yellow-crayola);
+    }
+
+    input:checked + .switch-slider:before {
+      transform: translateX(24px);
+      background-color: var(--smoky-black);
+    }
   </style>
   
   <!-- Ionicons CDN -->
@@ -887,13 +937,16 @@
         <button class="nav-btn" onclick="switchSection('certifications', this)">
           <ion-icon name="document-attach-outline"></ion-icon> Resume & Certs
         </button>
+        <button class="nav-btn" onclick="switchSection('theme', this)">
+          <ion-icon name="color-palette-outline"></ion-icon> Theme Settings
+        </button>
         <button class="nav-btn" onclick="switchSection('settings', this)">
           <ion-icon name="settings-outline"></ion-icon> G-Drive Settings
         </button>
       </nav>
       
       <div style="margin-top: auto; padding-left: 10px;">
-        <a href="/" class="back-link">
+        <a href="index.html" class="back-link">
           <ion-icon name="arrow-back-outline"></ion-icon> View Portfolio
         </a>
       </div>
@@ -1044,6 +1097,75 @@
           <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addCertCard()">
             <ion-icon name="add-circle-outline"></ion-icon> Add Certification
           </button>
+        </div>
+      </section>
+
+      <!-- SECTION: THEME SETTINGS -->
+      <section id="section-theme" class="editor-section">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="field-label">Theme Mode</label>
+            <select id="theme-mode" class="input-field" style="background: var(--smoky-black); color: var(--white-2); border: 1px solid var(--jet); border-radius: 8px; padding: 12px;" onchange="handlePresetOrModeChange()">
+              <option value="dark">Dark Mode</option>
+              <option value="light">Light Mode</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="field-label">Theme Preset Template</label>
+            <select id="theme-preset" class="input-field" style="background: var(--smoky-black); color: var(--white-2); border: 1px solid var(--jet); border-radius: 8px; padding: 12px;" onchange="handlePresetOrModeChange()">
+              <option value="default">Default (Slate & Gold)</option>
+              <option value="obsidian">Obsidian (Pure Dark & Cyan)</option>
+              <option value="emerald">Emerald (Deep Green & Mint)</option>
+              <option value="sunset">Sunset (Burnt Orange & Gold)</option>
+              <option value="lavender">Lavender (Amethyst & Violet)</option>
+              <option value="cyberpunk">Cyberpunk (Dark Violet & Pink)</option>
+              <option value="custom">Custom Color Palette</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="custom-theme-colors" style="display: none; margin-top: 25px; padding: 20px; border-radius: 12px; background: rgba(255, 255, 255, 0.02); border: 1px solid var(--jet);">
+          <h4 style="color: var(--orange-yellow-crayola); margin-bottom: 15px; font-size: 15px;">Custom Color Palette Choices</h4>
+          <div class="form-grid" style="grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));">
+            <div class="form-group">
+              <label class="field-label">Accent Color (Buttons, Links, Icons)</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="color" id="theme-accent-picker" class="input-field" style="width: 50px; height: 40px; padding: 2px; border: none; background: none;" onchange="updateHexFromPicker('theme-accent-picker', 'theme-accent')">
+                <input type="text" id="theme-accent" class="input-field" placeholder="#ffdb70" value="#ffdb70" onchange="updatePickerFromHex('theme-accent-picker', 'theme-accent')">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="field-label">Primary Background Color</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="color" id="theme-bg-picker" class="input-field" style="width: 50px; height: 40px; padding: 2px; border: none; background: none;" onchange="updateHexFromPicker('theme-bg-picker', 'theme-bg')">
+                <input type="text" id="theme-bg" class="input-field" placeholder="#090a0f" value="#090a0f" onchange="updatePickerFromHex('theme-bg-picker', 'theme-bg')">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 25px;">
+          <label class="field-label">Website Font Family</label>
+          <select id="theme-font" class="input-field" style="background: var(--smoky-black); color: var(--white-2); border: 1px solid var(--jet); border-radius: 8px; padding: 12px;">
+            <option value="Poppins">Poppins (Modern, Geometric)</option>
+            <option value="Inter">Inter (Clean, Tech)</option>
+            <option value="Roboto">Roboto (Versatile, Classic)</option>
+            <option value="Outfit">Outfit (Round, Creative)</option>
+            <option value="Montserrat">Montserrat (Sleek, Dynamic)</option>
+            <option value="Playfair Display">Playfair Display (Premium Serif)</option>
+            <option value="Fira Code">Fira Code (Developer Monospace)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-top: 25px; display: flex; align-items: center; justify-content: space-between; background: rgba(255, 255, 255, 0.02); padding: 16px 20px; border-radius: 12px; border: 1px solid var(--jet);">
+          <div>
+            <label class="field-label" style="margin-bottom: 4px;">AI Assistant Chatbot Display</label>
+            <span style="font-size: 12px; color: var(--light-gray-70);">Toggle chatbot visibility on your website</span>
+          </div>
+          <label class="switch-container">
+            <input type="checkbox" id="theme-chatbot" checked>
+            <span class="switch-slider"></span>
+          </label>
         </div>
       </section>
 
@@ -1421,6 +1543,7 @@
         'skills': 'Manage Skills',
         'projects': 'Manage Projects',
         'certifications': 'Resume & Certifications',
+        'theme': 'Theme & Styling',
         'settings': 'Google Drive Settings'
       };
       document.getElementById('section-title').textContent = titles[sectionId] || 'Editor';
@@ -1431,6 +1554,35 @@
       if (sidebar && sidebar.classList.contains('open')) {
         sidebar.classList.remove('open');
         overlay.classList.remove('active');
+      }
+    }
+
+    function handlePresetOrModeChange() {
+      const preset = document.getElementById('theme-preset').value;
+      const customDiv = document.getElementById('custom-theme-colors');
+      if (preset === 'custom') {
+        customDiv.style.display = 'block';
+      } else {
+        customDiv.style.display = 'none';
+      }
+    }
+
+    function updateHexFromPicker(pickerId, hexId) {
+      const picker = document.getElementById(pickerId);
+      const hexInput = document.getElementById(hexId);
+      if (picker && hexInput) {
+        hexInput.value = picker.value;
+      }
+    }
+
+    function updatePickerFromHex(pickerId, hexId) {
+      const picker = document.getElementById(pickerId);
+      const hexInput = document.getElementById(hexId);
+      if (picker && hexInput) {
+        let val = hexInput.value.trim();
+        if (/^#[0-9A-F]{6}$/i.test(val)) {
+          picker.value = val;
+        }
       }
     }
 
@@ -1502,6 +1654,28 @@
         });
       }
       
+      // 9. Theme Settings
+      if (data.theme) {
+        document.getElementById('theme-mode').value = data.theme.mode || 'dark';
+        document.getElementById('theme-preset').value = data.theme.preset || 'default';
+        document.getElementById('theme-accent').value = data.theme.accentColor || '#ffdb70';
+        document.getElementById('theme-accent-picker').value = data.theme.accentColor || '#ffdb70';
+        document.getElementById('theme-bg').value = data.theme.primaryColor || '#090a0f';
+        document.getElementById('theme-bg-picker').value = data.theme.primaryColor || '#090a0f';
+        document.getElementById('theme-font').value = data.theme.fontFamily || 'Poppins';
+        document.getElementById('theme-chatbot').checked = data.theme.chatbotEnabled !== false;
+      } else {
+        document.getElementById('theme-mode').value = 'dark';
+        document.getElementById('theme-preset').value = 'default';
+        document.getElementById('theme-accent').value = '#ffdb70';
+        document.getElementById('theme-accent-picker').value = '#ffdb70';
+        document.getElementById('theme-bg').value = '#090a0f';
+        document.getElementById('theme-bg-picker').value = '#090a0f';
+        document.getElementById('theme-font').value = 'Poppins';
+        document.getElementById('theme-chatbot').checked = true;
+      }
+      handlePresetOrModeChange();
+
       // Initialize drag-and-drop sortable lists
       initAllSortableLists();
     }
@@ -1916,6 +2090,15 @@
         }
         data.certifications.push(certEntry);
       });
+
+      data.theme = {
+        mode: document.getElementById('theme-mode').value,
+        preset: document.getElementById('theme-preset').value,
+        accentColor: document.getElementById('theme-accent').value.trim() || '#ffdb70',
+        primaryColor: document.getElementById('theme-bg').value.trim() || '#090a0f',
+        fontFamily: document.getElementById('theme-font').value,
+        chatbotEnabled: document.getElementById('theme-chatbot').checked
+      };
 
       return data;
     }
