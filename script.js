@@ -381,6 +381,34 @@ function initDynamicTilt() {
   }
 }
 
+// Toast logic
+function showToast(message, type = "success") {
+  const toast = document.getElementById("toast");
+  const icon = document.getElementById("toast-icon");
+  const title = document.getElementById("toast-title");
+  const desc = document.getElementById("toast-desc");
+
+  if (toast && icon && title && desc) {
+    if (type === "success") {
+      icon.setAttribute("name", "checkmark-circle");
+      icon.style.color = "var(--orange-yellow-crayola)";
+      toast.style.borderColor = "rgba(255, 219, 112, 0.3)";
+      title.textContent = "Success";
+    } else {
+      icon.setAttribute("name", "alert-circle");
+      icon.style.color = "var(--bittersweet-shimmer)";
+      toast.style.borderColor = "rgba(239, 68, 68, 0.3)";
+      title.textContent = "Error";
+    }
+    desc.textContent = message;
+
+    toast.classList.add("show");
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 4000);
+  }
+}
+
 function initInteractiveElements() {
   // Query/re-query dynamic containers
   articlesContainer = document.querySelector(".articles-container");
@@ -561,6 +589,11 @@ function initInteractiveElements() {
       })
       .then(() => {
         formBtn.innerHTML = originalBtnText;
+        if (form.checkValidity()) {
+          formBtn.removeAttribute("disabled");
+        } else {
+          formBtn.setAttribute("disabled", "");
+        }
       });
     });
   }
