@@ -1,0 +1,13 @@
+{
+  "name": "portfolio-admin-backend",
+  "version": "1.0.0",
+  "description": "Local server to handle file persistence for portfolio admin panel",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  }
+}

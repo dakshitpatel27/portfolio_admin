@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Admin Dashboard</title>
+  
+
+  
+  <link rel="shortcut icon" href="./assets/images/logo.ico" type="image/x-icon" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  
+  <style>
+    :root {
+      --jet: #1e293b;
+      --onyx: #334155;
+      --eerie-black-1: #0b0c10;
+      --eerie-black-2: rgba(15, 23, 42, 0.75);
+      --smoky-black: #090a0f;
+      --white-1: #ffffff;
+      --white-2: #f1f5f9;
+      --orange-yellow-crayola: #ffdb70;
+      --vegas-gold: #ffd43b;
+      --light-gray: #cbd5e1;
+      --light-gray-70: rgba(203, 213, 225, 0.7);
+      --bittersweet-shimmer: #ef4444;
+      --shadow-1: -4px 8px 24px hsla(0, 0%, 0%, 0.25);
+      --shadow-5: 0 24px 80px hsla(0, 0%, 0%, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: var(--smoky-black);
+      color: var(--white-2);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+    }
+
+    /* Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--smoky-black);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--onyx);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--orange-yellow-crayola);
+    }
+
+    /* Main Container */
+    .dashboard-container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 260px;
+      background: var(--eerie-black-2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 40px;
+      padding-left: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--white-1);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--light-gray-70);
+      padding: 12px 18px;
+      border-radius: 10px;
+      text-align: left;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--white-1);
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, rgba(255, 219, 112, 0.15), rgba(255, 212, 59, 0.15));
+      color: var(--orange-yellow-crayola);
+      border: 1px solid rgba(255, 219, 112, 0.3);
+    }
+
+    /* Main Content Area */
+    .main-content {
+      margin-left: 260px;
+      flex-grow: 1;
+      padding: 40px;
+      max-width: 1100px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      padding-bottom: 120px; /* Space for sticky save bar */
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--white-1);
+      position: relative;
+      padding-bottom: 8px;
+    }
+
+    .page-title::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 40px;
+      height: 4px;
+      background: linear-gradient(to right, var(--orange-yellow-crayola), var(--vegas-gold));
+      border-radius: 2px;
+    }
+
+    /* Section Card */
+    .editor-section {
+      display: none;
+      background: var(--eerie-black-2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: var(--shadow-1);
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .editor-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Form Fields Styling */
+    .form-group {
+      margin-bottom: 25px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+    }
+
+    .form-grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .field-label {
+      display: block;
+      color: var(--white-2);
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .input-field {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--white-1);
+      border: 1px solid var(--jet);
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .input-field:focus {
+      border-color: var(--orange-yellow-crayola);
+      box-shadow: 0 0 0 3px rgba(255, 219, 112, 0.15);
+    }
+
+    textarea.input-field {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* Nested items lists styles */
+    .list-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      margin-top: 10px;
+    }
+
+    .list-card {
+      position: relative;
+      background: rgba(30, 41, 59, 0.25);
+      border: 1px solid var(--jet);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 10px;
+    }
+
+    .list-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      border-bottom: 1px solid var(--jet);
+      padding-bottom: 8px;
+    }
+
+    .list-card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--orange-yellow-crayola);
+    }
+
+    .remove-btn {
+      background: none;
+      border: none;
+      color: var(--bittersweet-shimmer);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: opacity 0.2s ease;
+    }
+
+    .remove-btn:hover {
+      opacity: 0.8;
+      text-decoration: underline;
+    }
+
+    .add-btn {
+      background: none;
+      border: 1px dashed var(--orange-yellow-crayola);
+      color: var(--orange-yellow-crayola);
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      width: 100%;
+      text-align: center;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .add-btn:hover {
+      background: rgba(255, 219, 112, 0.05);
+    }
+
+    /* Nested items for experience roles */
+    .nested-container {
+      margin-top: 15px;
+      padding-left: 20px;
+      border-left: 2px solid var(--jet);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .nested-header {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--light-gray-70);
+      margin-bottom: 5px;
+    }
+
+    /* Action bar at bottom */
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 260px;
+      right: 0;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .server-status {
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .status-indicator.online {
+      background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+    }
+
+    .status-indicator.offline {
+      background: #ef4444;
+      box-shadow: 0 0 10px #ef4444;
+    }
+
+    .save-btn {
+      background: linear-gradient(135deg, var(--orange-yellow-crayola) 0%, var(--vegas-gold) 100%);
+      color: var(--eerie-black-1);
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 219, 112, 0.25);
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 219, 112, 0.35);
+    }
+
+    .save-btn:active {
+      transform: translateY(0);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      right: 30px;
+      background: rgba(15, 23, 42, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 219, 112, 0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-5);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      transform: translateY(150px);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .toast-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toast-title {
+      font-weight: 600;
+      color: var(--white-1);
+    }
+
+    .toast-desc {
+      font-size: 13px;
+      color: var(--light-gray-70);
+      margin-top: 2px;
+    }
+
+    .back-link {
+      color: var(--orange-yellow-crayola);
+      text-decoration: none;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(11, 12, 16, 0.3);
+      border-top-color: #0b0c10;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      display: inline-block;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Authenticated class checks */
+    .authenticated #password-gate {
+      display: none !important;
+    }
+
+    /* Password Gate Styles */
+    .password-gate-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(9, 10, 15, 0.96);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+    }
+
+    .password-card {
+      background: rgba(30, 41, 59, 0.45);
+      border: 1px solid rgba(255, 219, 112, 0.15);
+      border-radius: 24px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+      animation: gateScaleUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes gateScaleUp {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes gateShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    .lock-icon-wrapper {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, rgba(255, 219, 112, 0.15), rgba(255, 212, 59, 0.15));
+      border: 1px solid rgba(255, 219, 112, 0.3);
+      color: var(--orange-yellow-crayola);
+      font-size: 32px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto 24px auto;
+      box-shadow: 0 0 20px rgba(255, 219, 112, 0.1);
+    }
+
+    .password-card h3 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--white-1);
+      margin-bottom: 10px;
+    }
+
+    .password-card p {
+      font-size: 14px;
+      color: var(--light-gray-70);
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .password-input-group {
+      position: relative;
+      width: 100%;
+      margin-bottom: 15px;
+    }
+
+    .gate-input {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--white-1);
+      border: 1px solid var(--jet);
+      border-radius: 12px;
+      padding: 14px 50px 14px 18px;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .gate-input:focus {
+      border-color: var(--orange-yellow-crayola);
+      box-shadow: 0 0 0 3px rgba(255, 219, 112, 0.15);
+    }
+
+    .toggle-password-btn {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--light-gray-70);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s ease;
+    }
+
+    .toggle-password-btn:hover {
+      color: var(--white-1);
+    }
+
+    .gate-error {
+      color: var(--bittersweet-shimmer);
+      font-size: 13px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .gate-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .gate-btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .gate-btn.cancel {
+      background: transparent;
+      border: 1px solid var(--jet);
+      color: var(--light-gray);
+    }
+
+    .gate-btn.cancel:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--white-1);
+    }
+
+    .gate-btn.submit {
+      background: linear-gradient(135deg, var(--orange-yellow-crayola) 0%, var(--vegas-gold) 100%);
+      color: var(--eerie-black-1);
+      box-shadow: 0 4px 15px rgba(255, 219, 112, 0.25);
+    }
+    
+    .gate-btn.submit:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 219, 112, 0.35);
+    }
+
+    /* Drag & Drop Reordering Styles */
+    .list-card.dragging {
+      opacity: 0.4;
+      border: 1px dashed var(--orange-yellow-crayola) !important;
+      background: rgba(255, 219, 112, 0.05) !important;
+      box-shadow: none !important;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      color: var(--light-gray-70);
+      font-size: 18px;
+      transition: color 0.2s ease;
+      touch-action: none;
+    }
+
+    .drag-handle:hover {
+      color: var(--orange-yellow-crayola);
+    }
+
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
+    /* Mobile Responsive Styles */
+    .mobile-header {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--eerie-black-2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      z-index: 100;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .mobile-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-toggle-btn {
+      background: none;
+      border: none;
+      color: var(--orange-yellow-crayola);
+      font-size: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 9;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    @media (max-width: 950px) {
+      .mobile-header {
+        display: flex;
+      }
+
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding: 90px 20px 120px 20px; /* offset top header and bottom save bar */
+        max-width: 100%;
+      }
+
+      .action-bar {
+        left: 0;
+        padding: 15px 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 80px 12px 160px 12px;
+      }
+
+      .editor-section {
+        padding: 15px;
+        border-radius: 12px;
+      }
+
+      .list-card {
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .form-grid-3 {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+
+      .nested-container {
+        padding-left: 10px;
+      }
+
+      .header-bar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+      }
+
+      .page-title {
+        font-size: 24px;
+      }
+
+      .password-card {
+        padding: 30px 20px;
+        margin: 15px;
+      }
+
+      .action-bar {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        background: rgba(15, 23, 42, 0.95);
+      }
+
+      .server-status {
+        justify-content: center;
+      }
+
+      .save-btn {
+        justify-content: center;
+        width: 100%;
+      }
+    }
+  </style>
+  
+  <!-- Ionicons CDN -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+
+  <!-- Password Gate Overlay -->
+  <div id="password-gate" class="password-gate-overlay">
+    <div class="password-card">
+      <div class="lock-icon-wrapper">
+        <ion-icon id="gate-card-icon" name="lock-closed-outline"></ion-icon>
+      </div>
+      <h3 id="gate-card-title">Verification Required</h3>
+      <p id="gate-card-desc">Please enter your administrator password to access the portfolio dashboard.</p>
+      
+      <!-- Password Input Section -->
+      <div id="gate-password-section" style="margin-bottom: 15px;">
+        <div class="password-input-group">
+          <input type="password" id="gate-password-input" class="gate-input" placeholder="Enter password..." autofocus>
+          <button type="button" class="toggle-password-btn" onclick="toggleGatePasswordVisibility()">
+            <ion-icon id="gate-password-eye" name="eye-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+      
+      <div id="gate-error-message" class="gate-error" style="display: none;">Incorrect password! Please try again.</div>
+      
+      <div class="gate-actions">
+        <button type="button" id="gate-back-btn" class="gate-btn cancel" onclick="cancelAuthentication()">Cancel</button>
+        <button type="button" id="gate-submit-btn" class="gate-btn submit" onclick="submitAuthentication()">Unlock Dashboard</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Top Header -->
+  <header class="mobile-header">
+    <div class="mobile-brand">
+      <svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffdb70" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width: 28px; height: 28px;">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      <span class="brand-title" style="font-size: 18px;">Admin Panel</span>
+    </div>
+    <button type="button" class="menu-toggle-btn" onclick="toggleMobileSidebar()">
+      <ion-icon name="menu-outline"></ion-icon>
+    </button>
+  </header>
+
+  <!-- Sidebar Overlay for mobile tap-away closure -->
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
+  <div class="dashboard-container">
+    
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <svg class="brand-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ffdb70" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+        <span class="brand-title">Admin Panel</span>
+      </div>
+      
+      <nav class="nav-list">
+        <button class="nav-btn active" onclick="switchSection('profile', this)">
+          <ion-icon name="person-outline"></ion-icon> Profile Info
+        </button>
+        <button class="nav-btn" onclick="switchSection('about', this)">
+          <ion-icon name="document-text-outline"></ion-icon> About Section
+        </button>
+        <button class="nav-btn" onclick="switchSection('experience', this)">
+          <ion-icon name="briefcase-outline"></ion-icon> Experience
+        </button>
+        <button class="nav-btn" onclick="switchSection('education', this)">
+          <ion-icon name="book-outline"></ion-icon> Education
+        </button>
+        <button class="nav-btn" onclick="switchSection('skills', this)">
+          <ion-icon name="hammer-outline"></ion-icon> Skills
+        </button>
+        <button class="nav-btn" onclick="switchSection('projects', this)">
+          <ion-icon name="grid-outline"></ion-icon> Projects
+        </button>
+        <button class="nav-btn" onclick="switchSection('certifications', this)">
+          <ion-icon name="document-attach-outline"></ion-icon> Resume & Certs
+        </button>
+        <button class="nav-btn" onclick="switchSection('settings', this)">
+          <ion-icon name="settings-outline"></ion-icon> G-Drive Settings
+        </button>
+      </nav>
+      
+      <div style="margin-top: auto; padding-left: 10px;">
+        <a href="index.html" class="back-link">
+          <ion-icon name="arrow-back-outline"></ion-icon> View Portfolio
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Editor -->
+    <main class="main-content">
+      
+      <div class="header-bar">
+        <h2 id="section-title" class="page-title">Profile Info</h2>
+      </div>
+
+      <!-- SECTION: PROFILE -->
+      <section id="section-profile" class="editor-section active">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="field-label">Full Name</label>
+            <input type="text" id="prof-name" class="input-field">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Role Title</label>
+            <input type="text" id="prof-role" class="input-field">
+          </div>
+        </div>
+        
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="field-label">Company Name</label>
+            <input type="text" id="prof-company" class="input-field">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Avatar Image Path</label>
+            <input type="text" id="prof-avatar" class="input-field">
+          </div>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="field-label">Email</label>
+            <input type="email" id="prof-email" class="input-field">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Phone</label>
+            <input type="text" id="prof-phone" class="input-field">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Birthday</label>
+            <input type="text" id="prof-birthday" class="input-field">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="field-label">Location Address</label>
+          <input type="text" id="prof-location" class="input-field">
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="field-label">LinkedIn URL</label>
+            <input type="text" id="prof-linkedin" class="input-field">
+          </div>
+          <div class="form-group">
+            <label class="field-label">GitHub URL</label>
+            <input type="text" id="prof-github" class="input-field">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Instagram URL</label>
+            <input type="text" id="prof-instagram" class="input-field">
+          </div>
+        </div>
+      </section>
+
+      <!-- SECTION: ABOUT -->
+      <section id="section-about" class="editor-section">
+        <div class="form-group">
+          <label class="field-label">About Me Bio Paragraphs</label>
+          <div id="about-paragraphs-list" class="list-container">
+            <!-- Dynamic Textareas -->
+          </div>
+          <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addAboutParagraph()">
+            <ion-icon name="add-circle-outline"></ion-icon> Add Paragraph
+          </button>
+        </div>
+
+        <div class="form-group" style="margin-top: 40px;">
+          <label class="field-label" style="font-size: 16px; border-bottom: 1px solid var(--jet); padding-bottom: 8px;">What I'm Doing (Services)</label>
+          <div id="about-services-list" class="list-container">
+            <!-- Dynamic Cards -->
+          </div>
+          <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addServiceCard()">
+            <ion-icon name="add-circle-outline"></ion-icon> Add Service Card
+          </button>
+        </div>
+      </section>
+
+      <!-- SECTION: EXPERIENCE -->
+      <section id="section-experience" class="editor-section">
+        <div id="experience-list" class="list-container">
+          <!-- Dynamic Experience Cards -->
+        </div>
+        <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addExperienceCard()">
+          <ion-icon name="add-circle-outline"></ion-icon> Add Company Group
+        </button>
+      </section>
+
+      <!-- SECTION: EDUCATION -->
+      <section id="section-education" class="editor-section">
+        <div id="education-list" class="list-container">
+          <!-- Dynamic Education Cards -->
+        </div>
+        <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addEducationCard()">
+          <ion-icon name="add-circle-outline"></ion-icon> Add Education Entry
+        </button>
+      </section>
+
+      <!-- SECTION: SKILLS -->
+      <section id="section-skills" class="editor-section">
+        <div id="skills-list" class="list-container">
+          <!-- Dynamic Skills Row -->
+        </div>
+        <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addSkillRow()">
+          <ion-icon name="add-circle-outline"></ion-icon> Add Skill Progress Bar
+        </button>
+      </section>
+
+      <!-- SECTION: PROJECTS -->
+      <section id="section-projects" class="editor-section">
+        <div id="projects-list" class="list-container">
+          <!-- Dynamic Project Cards -->
+        </div>
+        <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addProjectCard()">
+          <ion-icon name="add-circle-outline"></ion-icon> Add Project Card
+        </button>
+      </section>
+
+      <!-- SECTION: CERTIFICATIONS -->
+      <section id="section-certifications" class="editor-section">
+        <div class="form-group">
+          <label class="field-label">Resume Download Link (Google Drive / PDF)</label>
+          <input type="text" id="resume-download" class="input-field">
+        </div>
+        
+        <div class="form-group" style="margin-top: 30px;">
+          <label class="field-label">Certifications List</label>
+          <div id="certifications-list" class="list-container">
+            <!-- Dynamic Cert Cards -->
+          </div>
+          <button type="button" class="add-btn" style="margin-top: 15px;" onclick="addCertCard()">
+            <ion-icon name="add-circle-outline"></ion-icon> Add Certification
+          </button>
+        </div>
+      </section>
+
+      <!-- SECTION: SETTINGS -->
+      <section id="section-settings" class="editor-section">
+        <div class="form-group">
+          <label class="field-label">Google Apps Script Web App URL</label>
+          <input type="text" id="gdrive-url" class="input-field" placeholder="https://script.google.com/macros/s/.../exec" oninput="saveDriveUrl()">
+          <p style="font-size: 13px; color: var(--light-gray-70); margin-top: 8px;">
+            Input the deployed Web App URL from your Google Apps Script. This connects your portfolio dashboard and main site directly to the JSON file on your Google Drive.
+          </p>
+        </div>
+
+        <div class="form-group" style="margin-top: 30px;">
+          <label class="field-label">Admin Panel Password</label>
+          <div class="password-input-group" style="position: relative; width: 100%;">
+            <input type="password" id="settings-admin-password" class="input-field" placeholder="Enter new password..." style="padding-right: 50px;">
+            <button type="button" class="toggle-password-btn" onclick="toggleSettingsPasswordVisibility()" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--light-gray-70); font-size: 20px; cursor: pointer;">
+              <ion-icon id="settings-password-eye" name="eye-outline"></ion-icon>
+            </button>
+          </div>
+          <p style="font-size: 13px; color: var(--light-gray-70); margin-top: 8px;">
+            Set your Admin Panel password here. When you click **Save Configuration** (sticky bar at bottom), it will update `config.js` with your new password.
+          </p>
+        </div>
+
+        <button type="button" class="add-btn" style="margin-top: 15px; width: auto; padding: 12px 24px; display: inline-flex;" onclick="fetchFromGoogleDrive()">
+          <ion-icon name="cloud-download-outline"></ion-icon> Fetch Latest Data from Google Drive
+        </button>
+
+        <div style="margin-top: 40px; padding: 20px; border-radius: 12px; background: rgba(255, 219, 112, 0.05); border: 1px solid rgba(255, 219, 112, 0.15);">
+          <h4 style="color: var(--orange-yellow-crayola); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <ion-icon name="information-circle-outline"></ion-icon> Setup Instructions:
+          </h4>
+          <ol style="margin-left: 20px; font-size: 14px; color: var(--light-gray); display: flex; flex-direction: column; gap: 8px;">
+            <li>Create a new script at <a href="https://script.google.com" target="_blank" style="color: var(--orange-yellow-crayola);">script.google.com</a>.</li>
+            <li>Copy and paste the code from <code>google-apps-script.js</code> (located in your project root) into the script editor.</li>
+            <li>Click <strong>Deploy > New deployment</strong>.</li>
+            <li>Select type <strong>Web app</strong>. Configure:
+              <ul style="margin-left: 20px; margin-top: 4px; list-style-type: circle;">
+                <li><strong>Execute as:</strong> Me</li>
+                <li><strong>Who has access:</strong> Anyone</li>
+              </ul>
+            </li>
+            <li>Click Deploy, authorize permissions, and copy the generated <strong>Web App URL</strong>.</li>
+            <li>Paste it in the field above!</li>
+          </ol>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Sticky Save Bar -->
+    <div class="action-bar">
+      <div class="server-status">
+        <div id="status-dot" class="status-indicator offline"></div>
+        <span id="status-text">Server Status: Checking...</span>
+      </div>
+      <button id="save-button" class="save-btn" onclick="savePortfolioConfig()">
+        <ion-icon name="save-outline"></ion-icon> Save Configuration
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Toast Notification HTML -->
+  <div id="toast" class="toast">
+    <div class="toast-content">
+      <ion-icon id="toast-icon" name="checkmark-circle" class="toast-icon" style="font-size: 24px;"></ion-icon>
+      <div class="toast-message">
+        <span id="toast-title" class="toast-title">Success</span>
+        <div id="toast-desc" class="toast-desc">Configuration saved!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include data.js configuration -->
+  <script src="config.js"></script>
+  <script src="data.js"></script>
+
+  <script>
+    // Password Gate Actions
+    function submitAuthentication() {
+      const input = document.getElementById('gate-password-input').value;
+      const savedPass = window.ADMIN_PASSWORD || "admin123";
+      if (input === savedPass) {
+        sessionStorage.setItem('admin_authenticated', 'true');
+        document.documentElement.classList.add('authenticated');
+        
+        // Smooth fade out of overlay
+        const gate = document.getElementById('password-gate');
+        if (gate) {
+          gate.style.opacity = '0';
+          setTimeout(() => {
+            gate.remove();
+          }, 400); // match transition
+        }
+      } else {
+        const errMsg = document.getElementById('gate-error-message');
+        if (errMsg) errMsg.style.display = 'block';
+        
+        // Shake animation for card
+        const card = document.querySelector('.password-card');
+        if (card) {
+          card.style.animation = 'gateShake 0.4s ease';
+          setTimeout(() => {
+            card.style.animation = '';
+          }, 400);
+        }
+      }
+    }
+
+    function cancelAuthentication() {
+      window.close();
+      window.location.href = "index.html";
+    }
+
+    function toggleGatePasswordVisibility() {
+      const input = document.getElementById('gate-password-input');
+      const icon = document.getElementById('gate-password-eye');
+      if (input && icon) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.setAttribute('name', 'eye-off-outline');
+        } else {
+          input.type = 'password';
+          icon.setAttribute('name', 'eye-outline');
+        }
+      }
+    }
+
+    function toggleSettingsPasswordVisibility() {
+      const input = document.getElementById('settings-admin-password');
+      const icon = document.getElementById('settings-password-eye');
+      if (input && icon) {
+        if (input.type === 'password') {
+          input.type = 'text';
+          icon.setAttribute('name', 'eye-off-outline');
+        } else {
+          input.type = 'password';
+          icon.setAttribute('name', 'eye-outline');
+        }
+      }
+    }
+
+
+
+    // Initialize password gate listeners
+    document.addEventListener('DOMContentLoaded', () => {
+      // Clear session auth state on load so it prompts every time the page is loaded/opened
+      sessionStorage.removeItem('admin_authenticated');
+      
+      const input = document.getElementById('gate-password-input');
+      if (input) {
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter') {
+            submitAuthentication();
+          }
+        });
+        // Auto-focus field
+        setTimeout(() => input.focus(), 100);
+      }
+      
+
+      
+      // Populate admin settings password
+      const settingsPass = document.getElementById('settings-admin-password');
+      if (settingsPass) {
+        settingsPass.value = window.ADMIN_PASSWORD || 'admin123';
+      }
+    });
+
+    let isServerOnline = false;
+    let isLocalServerOnline = false;
+    let isGoogleDriveMode = false;
+
+    // Check status of Google Drive and Express server
+    function checkServerStatus() {
+      // 1. Check if local Express server is online
+      fetch('/api/status')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.online) {
+            isLocalServerOnline = true;
+          } else {
+            isLocalServerOnline = false;
+          }
+          updateStatusUI();
+        })
+        .catch(() => {
+          isLocalServerOnline = false;
+          updateStatusUI();
+        });
+    }
+
+    function updateStatusUI() {
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      
+      if (gdriveUrl) {
+        isGoogleDriveMode = true;
+        isServerOnline = false; // Portfolio data saves to Google Drive
+        document.getElementById('status-dot').className = 'status-indicator online';
+        document.getElementById('status-text').textContent = 'Server Status: Google Drive Cloud Connected' + (isLocalServerOnline ? ' (Local Config Connected)' : '');
+      } else if (isLocalServerOnline) {
+        isGoogleDriveMode = false;
+        isServerOnline = true; // Portfolio data saves to local Express server
+        document.getElementById('status-dot').className = 'status-indicator online';
+        document.getElementById('status-text').textContent = 'Server Status: Local Backend Connected';
+      } else {
+        isGoogleDriveMode = false;
+        isServerOnline = false;
+        document.getElementById('status-dot').className = 'status-indicator offline';
+        document.getElementById('status-text').textContent = 'Server Status: Offline (Save downloads config)';
+      }
+    }
+
+    // Save G-Drive URL to localStorage
+    function saveDriveUrl() {
+      const url = document.getElementById('gdrive-url').value.trim();
+      if (url) {
+        localStorage.setItem('gdrive_api_url', url);
+      } else {
+        localStorage.removeItem('gdrive_api_url');
+      }
+      checkServerStatus();
+    }
+
+    // Fetch latest data from Google Apps Script Web App
+    function fetchFromGoogleDrive() {
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      if (!gdriveUrl) {
+        showToast("Please enter a Google Apps Script URL first.", "error");
+        return;
+      }
+
+      const fetchBtn = document.querySelector('button[onclick="fetchFromGoogleDrive()"]');
+      const originalHTML = fetchBtn.innerHTML;
+      fetchBtn.innerHTML = `<span class="spinner"></span> Fetching...`;
+      fetchBtn.setAttribute('disabled', '');
+
+      fetch(gdriveUrl)
+        .then(res => {
+          if (!res.ok) throw new Error("HTTP error " + res.status);
+          return res.json();
+        })
+        .then(data => {
+          if (data && data.profile) {
+            window.portfolioData = data;
+            populateForm(data);
+            showToast("Successfully loaded latest data from Google Drive!");
+          } else {
+            showToast("Invalid data format received from Google Drive.", "error");
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showToast("Failed to connect or fetch from Google Drive.", "error");
+        })
+        .then(() => {
+          fetchBtn.innerHTML = originalHTML;
+          fetchBtn.removeAttribute('disabled');
+        });
+    }
+
+    // Initialize forms on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      // Restore G-Drive URL input
+      let gdriveUrl = localStorage.getItem('gdrive_api_url');
+      if (!gdriveUrl && window.API_URL) {
+        gdriveUrl = window.API_URL;
+        document.getElementById('gdrive-url').value = gdriveUrl;
+      } else if (gdriveUrl) {
+        document.getElementById('gdrive-url').value = gdriveUrl;
+      }
+
+      checkServerStatus();
+
+      // 1. Populate form immediately using cache or fallback
+      const cachedDataStr = localStorage.getItem('portfolio_data_cache');
+      let loadedData = null;
+      if (cachedDataStr) {
+        try {
+          loadedData = JSON.parse(cachedDataStr);
+        } catch (e) {
+          console.error("Error parsing cached portfolio data:", e);
+        }
+      }
+      if (!loadedData && window.portfolioData) {
+        loadedData = window.portfolioData;
+      }
+      if (loadedData) {
+        populateForm(loadedData);
+      }
+
+      // 2. Fetch latest from Google Drive in background
+      const activeUrl = gdriveUrl || window.API_URL;
+      if (activeUrl) {
+        fetch(activeUrl)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.profile) {
+              const freshDataStr = JSON.stringify(data);
+              // Only populate if the fetched data is different from what we loaded initially
+              if (freshDataStr !== JSON.stringify(loadedData)) {
+                window.portfolioData = data;
+                populateForm(data);
+                showToast("Updated with latest data from Google Drive.");
+              }
+              localStorage.setItem('portfolio_data_cache', freshDataStr);
+            } else {
+              if (!loadedData && window.portfolioData) populateForm(window.portfolioData);
+            }
+          })
+          .catch(err => {
+            console.error(err);
+            if (!loadedData && window.portfolioData) populateForm(window.portfolioData);
+          });
+      } else if (!loadedData) {
+        if (window.portfolioData) {
+          populateForm(window.portfolioData);
+        } else {
+          showToast("portfolioData not loaded! Please check data.js file exists.", "error");
+        }
+      }
+    });
+
+    // Toast logic
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      const icon = document.getElementById("toast-icon");
+      const title = document.getElementById("toast-title");
+      const desc = document.getElementById("toast-desc");
+
+      if (type === "success") {
+        icon.setAttribute("name", "checkmark-circle");
+        icon.style.color = "var(--orange-yellow-crayola)";
+        toast.style.borderColor = "rgba(255, 219, 112, 0.3)";
+        title.textContent = "Success";
+      } else {
+        icon.setAttribute("name", "alert-circle");
+        icon.style.color = "var(--bittersweet-shimmer)";
+        toast.style.borderColor = "rgba(239, 68, 68, 0.3)";
+        title.textContent = "Error";
+      }
+      desc.textContent = message;
+
+      toast.classList.add("show");
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 4000);
+    }
+
+    function toggleMobileSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar && overlay) {
+        sidebar.classList.toggle('open');
+        overlay.classList.toggle('active');
+      }
+    }
+
+    // Switch between dashboard panels
+    function switchSection(sectionId, btnElement) {
+      document.querySelectorAll('.editor-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      
+      document.getElementById(`section-${sectionId}`).classList.add('active');
+      btnElement.classList.add('active');
+      
+      const titles = {
+        'profile': 'Profile Info',
+        'about': 'About Section',
+        'experience': 'Work Experience',
+        'education': 'Education History',
+        'skills': 'Manage Skills',
+        'projects': 'Manage Projects',
+        'certifications': 'Resume & Certifications',
+        'settings': 'Google Drive Settings'
+      };
+      document.getElementById('section-title').textContent = titles[sectionId] || 'Editor';
+
+      // Auto-close sidebar on mobile after selecting a section
+      const sidebar = document.querySelector('.sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      if (sidebar && sidebar.classList.contains('open')) {
+        sidebar.classList.remove('open');
+        overlay.classList.remove('active');
+      }
+    }
+
+    // POPULATE ALL DATA FIELDS FROM data.js
+    function populateForm(data) {
+      // 1. Profile
+      document.getElementById('prof-name').value = data.profile.name || '';
+      document.getElementById('prof-role').value = data.profile.role || '';
+      document.getElementById('prof-company').value = data.profile.company || '';
+      document.getElementById('prof-avatar').value = data.profile.avatar || '';
+      document.getElementById('prof-email').value = data.profile.email || '';
+      document.getElementById('prof-phone').value = data.profile.phone || '';
+      document.getElementById('prof-birthday').value = data.profile.birthday || '';
+      document.getElementById('prof-location').value = data.profile.location || '';
+      document.getElementById('prof-linkedin').value = data.profile.socials.linkedin || '';
+      document.getElementById('prof-github').value = data.profile.socials.github || '';
+      document.getElementById('prof-instagram').value = data.profile.socials.instagram || '';
+
+      // 2. About paragraphs
+      const pList = document.getElementById('about-paragraphs-list');
+      pList.innerHTML = '';
+      data.about.paragraphs.forEach((p, idx) => {
+        addAboutParagraph(p);
+      });
+
+      // 3. About services
+      const sList = document.getElementById('about-services-list');
+      sList.innerHTML = '';
+      data.about.services.forEach(serv => {
+        addServiceCard(serv);
+      });
+
+      // 4. Experience
+      const expList = document.getElementById('experience-list');
+      expList.innerHTML = '';
+      data.resume.experience.forEach(exp => {
+        addExperienceCard(exp);
+      });
+
+      // 5. Education
+      const eduList = document.getElementById('education-list');
+      eduList.innerHTML = '';
+      data.resume.education.forEach(edu => {
+        addEducationCard(edu);
+      });
+
+      // 6. Skills
+      const skList = document.getElementById('skills-list');
+      skList.innerHTML = '';
+      data.resume.skills.forEach(sk => {
+        addSkillRow(sk);
+      });
+
+      // 7. Projects
+      const prList = document.getElementById('projects-list');
+      prList.innerHTML = '';
+      data.projects.forEach(proj => {
+        addProjectCard(proj);
+      });
+
+      // 8. Resume Download Link and Certifications
+      document.getElementById('resume-download').value = data.resume.downloadLink || '';
+      
+      const certList = document.getElementById('certifications-list');
+      certList.innerHTML = '';
+      if (data.certifications && Array.isArray(data.certifications)) {
+        data.certifications.forEach(cert => {
+          addCertCard(cert);
+        });
+      }
+      
+      // Initialize drag-and-drop sortable lists
+      initAllSortableLists();
+    }
+
+    // DYNAMIC CONTENT ROW GENERATION HELPER FUNCTIONS
+
+    function addAboutParagraph(text = '') {
+      const container = document.getElementById('about-paragraphs-list');
+      const idx = container.children.length;
+      
+      const card = document.createElement('div');
+      card.className = 'list-card';
+      card.innerHTML = `
+        <div class="list-card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="drag-handle" style="cursor: grab;" onmouseover="this.closest('.list-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.list-card').setAttribute('draggable', 'false')">
+              <ion-icon name="reorder-two-outline"></ion-icon>
+            </span>
+            <span class="list-card-title">Paragraph #${idx + 1}</span>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.closest('.list-card').remove(); reorderParagraphTitles();">
+            <ion-icon name="trash-outline"></ion-icon> Remove
+          </button>
+        </div>
+        <textarea class="input-field paragraph-text" placeholder="Write bio paragraph text...">${text}</textarea>
+      `;
+      container.appendChild(card);
+    }
+
+    function reorderParagraphTitles() {
+      const container = document.getElementById('about-paragraphs-list');
+      Array.from(container.children).forEach((card, idx) => {
+        card.querySelector('.list-card-title').textContent = `Paragraph #${idx + 1}`;
+      });
+    }
+
+    function addServiceCard(service = { title: '', desc: '', icon: '' }) {
+      const container = document.getElementById('about-services-list');
+      const card = document.createElement('div');
+      card.className = 'list-card';
+      card.innerHTML = `
+        <div class="list-card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="drag-handle" style="cursor: grab;" onmouseover="this.closest('.list-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.list-card').setAttribute('draggable', 'false')">
+              <ion-icon name="reorder-two-outline"></ion-icon>
+            </span>
+            <span class="list-card-title">Service Card</span>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.closest('.list-card').remove()">
+            <ion-icon name="trash-outline"></ion-icon> Remove
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="field-label">Title</label>
+            <input type="text" class="input-field serv-title" value="${service.title}" placeholder="e.g. Back-End Development">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Icon Image Path / SVG</label>
+            <input type="text" class="input-field serv-icon" value="${service.icon}" placeholder="e.g. ./assets/images/icon-dev.svg">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="field-label">Short Description</label>
+          <input type="text" class="input-field serv-desc" value="${service.desc}" placeholder="Describe the service...">
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addExperienceCard(exp = { company: '', logo: '', totalDuration: '', roles: [] }) {
+      const container = document.getElementById('experience-list');
+      const card = document.createElement('div');
+      card.className = 'list-card exp-card';
+      
+      const rolesHTML = (exp.roles || []).map(role => getNestedRoleHTML(role.title, role.dates, role.desc)).join('');
+      
+      card.innerHTML = `
+        <div class="list-card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="drag-handle" style="cursor: grab;" onmouseover="this.closest('.list-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.list-card').setAttribute('draggable', 'false')">
+              <ion-icon name="reorder-two-outline"></ion-icon>
+            </span>
+            <span class="list-card-title">Company Work History</span>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.closest('.list-card').remove()">
+            <ion-icon name="trash-outline"></ion-icon> Remove Company
+          </button>
+        </div>
+        <div class="form-grid-3">
+          <div class="form-group">
+            <label class="field-label">Company Name</label>
+            <input type="text" class="input-field exp-company" value="${exp.company}">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Logo Path</label>
+            <input type="text" class="input-field exp-logo" value="${exp.logo}" placeholder="e.g. ./assets/images/logo.png">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Total Duration</label>
+            <input type="text" class="input-field exp-duration" value="${exp.totalDuration}" placeholder="e.g. Feb 2026 — Present">
+          </div>
+        </div>
+        
+        <div class="nested-container">
+          <div class="nested-header">Nested Roles / Promotions inside Company</div>
+          <div class="roles-list-container">
+            ${rolesHTML}
+          </div>
+          <button type="button" class="add-btn" style="margin-top: 10px; padding: 6px; font-size: 13px;" onclick="addNestedRole(this)">
+            <ion-icon name="add-outline"></ion-icon> Add Role
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
+      
+      // Initialize drag-and-drop for the new roles list inside this card
+      const rolesContainer = card.querySelector('.roles-list-container');
+      if (rolesContainer) {
+        rolesContainer.id = 'roles-list-' + Math.random().toString(36).substr(2, 9);
+        initSortableList(rolesContainer.id);
+      }
+    }
+
+    function getNestedRoleHTML(title = '', dates = '', desc = '') {
+      return `
+        <div class="list-card role-card" style="background: rgba(15, 23, 42, 0.4); margin-bottom: 10px; padding: 15px 15px 5px 15px;">
+          <div class="list-card-header" style="margin-bottom: 10px; padding-bottom: 4px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="drag-handle" style="cursor: grab; font-size: 14px;" onmouseover="this.closest('.role-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.role-card').setAttribute('draggable', 'false')">
+                <ion-icon name="reorder-two-outline"></ion-icon>
+              </span>
+              <span class="list-card-title" style="font-size: 13px; color: var(--light-gray);">Role Entry</span>
+            </div>
+            <button type="button" class="remove-btn" style="font-size: 11px;" onclick="this.closest('.role-card').remove()">
+              <ion-icon name="trash-outline"></ion-icon> Delete Role
+            </button>
+          </div>
+          <div class="form-grid" style="gap: 15px;">
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label class="field-label" style="font-size: 12px;">Role Title</label>
+              <input type="text" class="input-field role-title" value="${title}" placeholder="e.g. Jr. Python Developer" style="padding: 8px 12px; font-size: 14px;">
+            </div>
+            <div class="form-group" style="margin-bottom: 15px;">
+              <label class="field-label" style="font-size: 12px;">Dates / Period</label>
+              <input type="text" class="input-field role-dates" value="${dates}" placeholder="e.g. June 2026 — Present" style="padding: 8px 12px; font-size: 14px;">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom: 15px;">
+            <label class="field-label" style="font-size: 12px;">Job Description / Accomplishments</label>
+            <textarea class="input-field role-desc" placeholder="List tasks or accomplishments..." style="padding: 8px 12px; font-size: 14px; min-height: 70px;">${desc}</textarea>
+          </div>
+        </div>
+      `;
+    }
+
+    function addNestedRole(btnElement) {
+      const rolesContainer = btnElement.closest('.nested-container').querySelector('.roles-list-container');
+      const roleDiv = document.createElement('div');
+      roleDiv.innerHTML = getNestedRoleHTML();
+      rolesContainer.appendChild(roleDiv.firstElementChild);
+    }
+
+    function addEducationCard(edu = { school: '', logo: '', dates: '', desc: '' }) {
+      const container = document.getElementById('education-list');
+      const card = document.createElement('div');
+      card.className = 'list-card edu-card';
+      card.innerHTML = `
+        <div class="list-card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="drag-handle" style="cursor: grab;" onmouseover="this.closest('.list-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.list-card').setAttribute('draggable', 'false')">
+              <ion-icon name="reorder-two-outline"></ion-icon>
+            </span>
+            <span class="list-card-title">Education Institution</span>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.closest('.list-card').remove()">
+            <ion-icon name="trash-outline"></ion-icon> Remove
+          </button>
+        </div>
+        <div class="form-grid-3">
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="field-label">School / University Name</label>
+            <input type="text" class="input-field edu-school" value="${edu.school}">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Period Dates</label>
+            <input type="text" class="input-field edu-dates" value="${edu.dates}" placeholder="e.g. 2022 — 2026">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Logo Path</label>
+            <input type="text" class="input-field edu-logo" value="${edu.logo}" placeholder="e.g. ./assets/images/school-logo.png">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Description / Grade / Degree</label>
+            <input type="text" class="input-field edu-desc" value="${edu.desc}">
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addSkillRow(skill = { name: '', level: '80' }) {
+      const container = document.getElementById('skills-list');
+      const card = document.createElement('div');
+      card.className = 'list-card skill-card';
+      card.innerHTML = `
+        <div class="list-card-header" style="margin-bottom: 10px; padding-bottom: 4px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="drag-handle" style="cursor: grab;" onmouseover="this.closest('.list-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.list-card').setAttribute('draggable', 'false')">
+              <ion-icon name="reorder-two-outline"></ion-icon>
+            </span>
+            <span class="list-card-title">Skill Progress</span>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.closest('.list-card').remove()">
+            <ion-icon name="trash-outline"></ion-icon> Remove
+          </button>
+        </div>
+        <div class="form-grid" style="gap: 15px;">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Skill Name</label>
+            <input type="text" class="input-field skill-name" value="${skill.name}" placeholder="e.g. Python">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Skill Level (%)</label>
+            <input type="number" min="0" max="100" class="input-field skill-level" value="${skill.level}">
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addProjectCard(proj = { title: '', category: '', image: '', link: '#' }) {
+      const container = document.getElementById('projects-list');
+      const card = document.createElement('div');
+      card.className = 'list-card proj-card';
+      card.innerHTML = `
+        <div class="list-card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="drag-handle" style="cursor: grab;" onmouseover="this.closest('.list-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.list-card').setAttribute('draggable', 'false')">
+              <ion-icon name="reorder-two-outline"></ion-icon>
+            </span>
+            <span class="list-card-title">Project Card</span>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.closest('.list-card').remove()">
+            <ion-icon name="trash-outline"></ion-icon> Remove
+          </button>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="field-label">Project Title</label>
+            <input type="text" class="input-field proj-title" value="${proj.title}">
+          </div>
+          <div class="form-group">
+            <label class="field-label">Category</label>
+            <input type="text" class="input-field proj-category" value="${proj.category}" placeholder="e.g. Front-End Development">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Image Path</label>
+            <input type="text" class="input-field proj-image" value="${proj.image}" placeholder="e.g. ./assets/images/project.jpg">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Target Link URL</label>
+            <input type="text" class="input-field proj-link" value="${proj.link}">
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+    function addCertCard(cert = { title: '', link: '', badge: '' }) {
+      const container = document.getElementById('certifications-list');
+      const card = document.createElement('div');
+      card.className = 'list-card cert-card';
+      card.innerHTML = `
+        <div class="list-card-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="drag-handle" style="cursor: grab;" onmouseover="this.closest('.list-card').setAttribute('draggable', 'true')" onmouseout="this.closest('.list-card').setAttribute('draggable', 'false')">
+              <ion-icon name="reorder-two-outline"></ion-icon>
+            </span>
+            <span class="list-card-title">Certification</span>
+          </div>
+          <button type="button" class="remove-btn" onclick="this.closest('.list-card').remove()">
+            <ion-icon name="trash-outline"></ion-icon> Remove
+          </button>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Certification Title</label>
+          <input type="text" class="input-field cert-title" value="${cert.title}">
+        </div>
+        <div class="form-grid">
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Certificate Verification URL</label>
+            <input type="text" class="input-field cert-link" value="${cert.link}">
+          </div>
+          <div class="form-group" style="margin-bottom: 0;">
+            <label class="field-label">Verify Badge URL (Optional, Credly)</label>
+            <input type="text" class="input-field cert-badge" value="${cert.badge || ''}">
+          </div>
+        </div>
+      `;
+      container.appendChild(card);
+    }
+
+
+    // CONSTRUCT UPDATED DATA OBJECT AND SAVE/DOWNLOAD
+    function getFormValues() {
+      const data = {
+        profile: {
+          name: document.getElementById('prof-name').value.trim(),
+          role: document.getElementById('prof-role').value.trim(),
+          company: document.getElementById('prof-company').value.trim(),
+          avatar: document.getElementById('prof-avatar').value.trim(),
+          email: document.getElementById('prof-email').value.trim(),
+          phone: document.getElementById('prof-phone').value.trim(),
+          birthday: document.getElementById('prof-birthday').value.trim(),
+          location: document.getElementById('prof-location').value.trim(),
+          socials: {
+            linkedin: document.getElementById('prof-linkedin').value.trim(),
+            github: document.getElementById('prof-github').value.trim(),
+            instagram: document.getElementById('prof-instagram').value.trim()
+          }
+        },
+        about: {
+          paragraphs: [],
+          services: []
+        },
+        resume: {
+          downloadLink: document.getElementById('resume-download').value.trim(),
+          experience: [],
+          education: [],
+          skills: []
+        },
+        projects: [],
+        certifications: []
+      };
+
+      // About Paragraphs
+      document.querySelectorAll('#about-paragraphs-list .paragraph-text').forEach(textarea => {
+        data.about.paragraphs.push(textarea.value.trim());
+      });
+
+      // About Services
+      document.querySelectorAll('#about-services-list .list-card').forEach(card => {
+        data.about.services.push({
+          title: card.querySelector('.serv-title').value.trim(),
+          desc: card.querySelector('.serv-desc').value.trim(),
+          icon: card.querySelector('.serv-icon').value.trim()
+        });
+      });
+
+      // Resume Experience
+      document.querySelectorAll('#experience-list .exp-card').forEach(card => {
+        const expEntry = {
+          company: card.querySelector('.exp-company').value.trim(),
+          logo: card.querySelector('.exp-logo').value.trim(),
+          totalDuration: card.querySelector('.exp-duration').value.trim(),
+          roles: []
+        };
+
+        card.querySelectorAll('.role-card').forEach(roleCard => {
+          expEntry.roles.push({
+            title: roleCard.querySelector('.role-title').value.trim(),
+            dates: roleCard.querySelector('.role-dates').value.trim(),
+            desc: roleCard.querySelector('.role-desc').value.trim()
+          });
+        });
+
+        data.resume.experience.push(expEntry);
+      });
+
+      // Resume Education
+      document.querySelectorAll('#education-list .edu-card').forEach(card => {
+        data.resume.education.push({
+          school: card.querySelector('.edu-school').value.trim(),
+          logo: card.querySelector('.edu-logo').value.trim(),
+          dates: card.querySelector('.edu-dates').value.trim(),
+          desc: card.querySelector('.edu-desc').value.trim()
+        });
+      });
+
+      // Resume Skills
+      document.querySelectorAll('#skills-list .skill-card').forEach(card => {
+        data.resume.skills.push({
+          name: card.querySelector('.skill-name').value.trim(),
+          level: card.querySelector('.skill-level').value.trim()
+        });
+      });
+
+      // Projects
+      document.querySelectorAll('#projects-list .proj-card').forEach(card => {
+        data.projects.push({
+          title: card.querySelector('.proj-title').value.trim(),
+          category: card.querySelector('.proj-category').value.trim(),
+          image: card.querySelector('.proj-image').value.trim(),
+          link: card.querySelector('.proj-link').value.trim()
+        });
+      });
+
+      // Certifications
+      document.querySelectorAll('#certifications-list .cert-card').forEach(card => {
+        const certEntry = {
+          title: card.querySelector('.cert-title').value.trim(),
+          link: card.querySelector('.cert-link').value.trim()
+        };
+        const badgeVal = card.querySelector('.cert-badge').value.trim();
+        if (badgeVal) {
+          certEntry.badge = badgeVal;
+        }
+        data.certifications.push(certEntry);
+      });
+
+      return data;
+    }
+
+    function saveSettingsConfig() {
+      if (!isLocalServerOnline) return;
+      
+      const adminPass = document.getElementById('settings-admin-password').value.trim();
+      const apiPref = document.getElementById('gdrive-url').value.trim();
+      
+      fetch('/api/save-config', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          api_url: apiPref,
+          admin_password: adminPass || 'admin123'
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          window.API_URL = apiPref;
+          window.ADMIN_PASSWORD = adminPass || 'admin123';
+        }
+      })
+      .catch(err => console.error("Failed to update config.js:", err));
+    }
+
+    // Save changes function (Post request to G-Drive if configured, otherwise Express if online, otherwise download file)
+    function savePortfolioConfig() {
+      saveSettingsConfig();
+      const configData = getFormValues();
+      const saveBtn = document.getElementById('save-button');
+      const originalHTML = saveBtn.innerHTML;
+      
+      saveBtn.innerHTML = `<span class="spinner"></span> Saving...`;
+      saveBtn.setAttribute('disabled', '');
+
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+
+      if (gdriveUrl) {
+        // Run POST request to Google Apps Script Web App (saves to Google Drive)
+        fetch(gdriveUrl, {
+          method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
+          body: JSON.stringify(configData)
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showToast("Configuration saved successfully to Google Drive!");
+            window.portfolioData = configData;
+            localStorage.setItem('portfolio_data_cache', JSON.stringify(configData));
+          } else {
+            showToast(data.error || "Failed to save configuration to Google Drive.", "error");
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showToast("Network error. Saving to Google Drive failed.", "error");
+        })
+        .then(() => {
+          saveBtn.innerHTML = originalHTML;
+          saveBtn.removeAttribute('disabled');
+        });
+      } else if (isServerOnline) {
+        // Run POST request to local express server
+        fetch('/api/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(configData)
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            showToast("Configuration saved successfully to files!");
+            window.portfolioData = configData;
+            localStorage.setItem('portfolio_data_cache', JSON.stringify(configData));
+          } else {
+            showToast(data.error || "Failed to save configuration.", "error");
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          showToast("Network error. Saving failed.", "error");
+        })
+        .then(() => {
+          saveBtn.innerHTML = originalHTML;
+          saveBtn.removeAttribute('disabled');
+        });
+      } else {
+        // Trigger a file download for manual placement
+        try {
+          const fileContent = `// Automatically generated portfolio configuration data.
+// Do not edit this file directly unless you know what you are doing.
+
+window.portfolioData = ${JSON.stringify(configData, null, 2)};
+`;
+          const blob = new Blob([fileContent], { type: 'application/javascript;charset=utf-8' });
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          
+          link.href = url;
+          link.download = 'data.js';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          
+          showToast("data.js generated! Please replace the old data.js in your folder.");
+          window.portfolioData = configData;
+          localStorage.setItem('portfolio_data_cache', JSON.stringify(configData));
+        } catch (err) {
+          console.error(err);
+          showToast("Failed to download file.", "error");
+        } finally {
+          saveBtn.innerHTML = originalHTML;
+          saveBtn.removeAttribute('disabled');
+        }
+      }
+    }
+
+    // DRAG AND DROP REORDERING LOGIC
+    function initSortableList(containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      container.addEventListener('dragstart', (e) => {
+        const card = e.target.closest('.list-card');
+        if (!card) return;
+        card.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+      });
+
+      container.addEventListener('dragend', (e) => {
+        const card = e.target.closest('.list-card');
+        if (!card) return;
+        card.classList.remove('dragging');
+        if (containerId === 'about-paragraphs-list') {
+          reorderParagraphTitles();
+        }
+      });
+
+      container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const draggingCard = container.querySelector('.dragging');
+        if (!draggingCard) return;
+        
+        // Find the element immediately after the mouse position
+        const afterElement = getDragAfterElement(container, e.clientY);
+        if (afterElement == null) {
+          container.appendChild(draggingCard);
+        } else {
+          container.insertBefore(draggingCard, afterElement);
+        }
+      });
+    }
+
+    function getDragAfterElement(container, y) {
+      const draggableElements = [...container.querySelectorAll(':scope > .list-card:not(.dragging)')];
+
+      return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        if (offset < 0 && offset > closest.offset) {
+          return { offset: offset, element: child };
+        } else {
+          return closest;
+        }
+      }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    function initAllSortableLists() {
+      initSortableList('about-paragraphs-list');
+      initSortableList('about-services-list');
+      initSortableList('experience-list');
+      initSortableList('education-list');
+      initSortableList('skills-list');
+      initSortableList('projects-list');
+      initSortableList('certifications-list');
+      
+      // Initialize nested company experience roles
+      document.querySelectorAll('.roles-list-container').forEach(container => {
+        if (!container.id) {
+          container.id = 'roles-list-' + Math.random().toString(36).substr(2, 9);
+        }
+        initSortableList(container.id);
+      });
+    }
+  </script>
+</body>
+</html>
