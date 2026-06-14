@@ -230,6 +230,8 @@ function renderPortfolio(data) {
     if (mainWrapper) mainWrapper.style.display = 'none';
     if (chatbotToggle) chatbotToggle.style.display = 'none';
     
+
+    
     // Render dynamic socials on maintenance page
     const list = data.profile?.socialsList || [];
     const maintenanceSocials = document.getElementById('maintenance-socials');
@@ -1264,17 +1266,42 @@ function initInteractiveElements() {
           return { success: ok && data.success, error: data.error };
         }).catch(err => ({ success: false, error: err.message }));
 
-        Promise.allSettled([web3formsPromise, localPromise])
-        .then(([web3Result, localResult]) => {
+        // 3. Submit to Google Apps Script Web App if configured
+        let gdrivePromise = Promise.resolve({ success: false });
+        const gdriveUrl = window.API_URL || localStorage.getItem('gdrive_api_url');
+        if (gdriveUrl) {
+          gdrivePromise = fetch(gdriveUrl, {
+            method: "POST",
+            mode: "cors",
+            redirect: "follow",
+            body: JSON.stringify({
+              action: 'submit-message',
+              fullname: payload.fullname,
+              email: payload.email,
+              phone: payload.phone,
+              subject: payload.subject,
+              message: payload.message
+            })
+          }).then(async (res) => {
+            const ok = res.ok;
+            const data = await res.json();
+            return { success: ok && data.success, error: data.error };
+          }).catch(err => ({ success: false, error: err.message }));
+        }
+
+        Promise.allSettled([web3formsPromise, localPromise, gdrivePromise])
+        .then(([web3Result, localResult, gdriveResult]) => {
           const web3Success = web3Result.status === 'fulfilled' && web3Result.value.success;
           const localSuccess = localResult.status === 'fulfilled' && localResult.value.success;
+          const gdriveSuccess = gdriveResult.status === 'fulfilled' && gdriveResult.value.success;
 
-          if (web3Success || localSuccess) {
+          if (web3Success || localSuccess || gdriveSuccess) {
             showToast("Your message has been sent successfully!");
             form.reset();
           } else {
             const errMsg = (web3Result.status === 'fulfilled' ? web3Result.value.message : null) || 
                            (localResult.status === 'fulfilled' ? localResult.value.error : null) || 
+                           (gdriveResult.status === 'fulfilled' ? gdriveResult.value.error : null) || 
                            "Failed to send message. Please try again.";
             showToast(errMsg, "error");
           }
@@ -1387,3 +1414,95 @@ function initInteractiveElements() {
   // Show 'about' page on init
   showPage('about');
 }
+
+// Handle "Notify Me" form submission on the Maintenance / Under Development Page
+function submitNotificationRequest(event) {
+  event.preventDefault();
+  const form = event.target;
+  const emailInput = document.getElementById('notify-email');
+  const successMsg = document.getElementById('notify-success-msg');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  
+  if (!emailInput || !emailInput.value.trim()) return;
+
+  const email = emailInput.value.trim();
+  const originalBtnText = submitBtn.innerHTML;
+  
+  submitBtn.innerHTML = `<span class="spinner" style="border-top-color: var(--eerie-black-1); width: 12px; height: 12px; margin-right: 4px;"></span> Sending...`;
+  submitBtn.setAttribute('disabled', '');
+
+  const payload = {
+    fullname: "Notification Subscriber",
+    email: email,
+    phone: "",
+    subject: "Newsletter / Launch Notification Request",
+    message: `This visitor requested to be notified when the website is back online.`
+  };
+
+  // Determine submission endpoint (G-Drive cloud if configured, otherwise fallback local Express server)
+  const gdriveUrl = window.API_URL || localStorage.getItem('gdrive_api_url');
+  
+  let promise;
+  if (gdriveUrl) {
+    promise = fetch(gdriveUrl, {
+      method: "POST",
+      mode: "cors",
+      redirect: "follow",
+      body: JSON.stringify({
+        action: 'submit-message',
+        fullname: payload.fullname,
+        email: payload.email,
+        phone: payload.phone,
+        subject: payload.subject,
+        message: payload.message
+      })
+    })
+    .then(async (res) => {
+      const data = await res.json();
+      return { success: res.ok && data.success, error: data.error };
+    });
+  } else {
+    promise = fetch('/api/submit-message', {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(async (res) => {
+      const data = await res.json();
+      return { success: res.ok && data.success, error: data.error };
+    });
+  }
+
+  promise
+  .then(result => {
+    if (result.success) {
+      if (successMsg) {
+        successMsg.style.display = 'block';
+        successMsg.innerHTML = `<ion-icon name="checkmark-circle-outline" style="vertical-align: middle; margin-right: 4px; font-size: 16px; color: var(--orange-yellow-crayola);"></ion-icon>You will be notified when we are online!`;
+        successMsg.style.color = 'var(--orange-yellow-crayola)';
+      }
+      form.reset();
+    } else {
+      if (successMsg) {
+        successMsg.style.display = 'block';
+        successMsg.innerHTML = `<ion-icon name="alert-circle-outline" style="vertical-align: middle; margin-right: 4px; font-size: 16px; color: #ef4444;"></ion-icon>${result.error || 'Failed to request notification. Please try again.'}`;
+        successMsg.style.color = '#ef4444';
+      }
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    if (successMsg) {
+      successMsg.style.display = 'block';
+      successMsg.innerHTML = `<ion-icon name="alert-circle-outline" style="vertical-align: middle; margin-right: 4px; font-size: 16px; color: #ef4444;"></ion-icon>Network error. Please try again later.`;
+      successMsg.style.color = '#ef4444';
+    }
+  })
+  .then(() => {
+    submitBtn.innerHTML = originalBtnText;
+    submitBtn.removeAttribute('disabled');
+  });
+}
+

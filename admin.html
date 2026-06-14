@@ -142,12 +142,11 @@
       border: 1px solid rgba(255, 219, 112, 0.3);
     }
 
-    /* Main Content Area */
     .main-content {
       margin-left: 260px;
       flex-grow: 1;
       padding: 40px;
-      max-width: 1100px;
+      max-width: 100%;
       display: flex;
       flex-direction: column;
       gap: 30px;
@@ -716,6 +715,49 @@
       display: block;
     }
 
+    /* Inquiry Filter Tabs */
+    .filter-tab {
+      background: none;
+      border: none;
+      color: var(--light-gray-70);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+      outline: none;
+    }
+
+    .filter-tab:hover {
+      color: var(--white-1);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .filter-tab.active {
+      color: var(--orange-yellow-crayola);
+      background: rgba(255, 219, 112, 0.08);
+      border: 1px solid rgba(255, 219, 112, 0.2);
+    }
+
+    .filter-tab span {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--light-gray);
+    }
+
+    .filter-tab.active span {
+      background: var(--orange-yellow-crayola);
+      color: var(--eerie-black-1);
+    }
+
     @media (max-width: 950px) {
       .mobile-header {
         display: flex;
@@ -867,20 +909,28 @@
       <div class="lock-icon-wrapper">
         <ion-icon id="gate-card-icon" name="lock-closed-outline"></ion-icon>
       </div>
-      <h3 id="gate-card-title">Verification Required</h3>
-      <p id="gate-card-desc">Please enter your administrator password to access the portfolio dashboard.</p>
+      <h3 id="gate-card-title">Admin Login</h3>
+      <p id="gate-card-desc">Please enter your email ID and password to access the portfolio dashboard.</p>
+      
+      <!-- Email Input Section -->
+      <div id="gate-email-section" style="margin-bottom: 15px; width: 100%;">
+        <div class="password-input-group">
+          <input type="email" id="gate-email-input" class="gate-input" placeholder="Enter admin email..." autofocus style="padding-right: 15px;">
+          <ion-icon name="mail-outline" style="position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--light-gray-70); font-size: 20px; pointer-events: none;"></ion-icon>
+        </div>
+      </div>
       
       <!-- Password Input Section -->
-      <div id="gate-password-section" style="margin-bottom: 15px;">
+      <div id="gate-password-section" style="margin-bottom: 15px; width: 100%;">
         <div class="password-input-group">
-          <input type="password" id="gate-password-input" class="gate-input" placeholder="Enter password..." autofocus>
+          <input type="password" id="gate-password-input" class="gate-input" placeholder="Enter password...">
           <button type="button" class="toggle-password-btn" onclick="toggleGatePasswordVisibility()">
             <ion-icon id="gate-password-eye" name="eye-outline"></ion-icon>
           </button>
         </div>
       </div>
       
-      <div id="gate-error-message" class="gate-error" style="display: none;">Incorrect password! Please try again.</div>
+      <div id="gate-error-message" class="gate-error" style="display: none;">Incorrect email or password! Please try again.</div>
       
       <div class="gate-actions">
         <button type="button" id="gate-back-btn" class="gate-btn cancel" onclick="cancelAuthentication()">Cancel</button>
@@ -1281,7 +1331,8 @@
             <input type="text" id="site-favicon" class="input-field" placeholder="e.g. ./assets/images/logo.ico">
           </div>
         </div>
-        
+
+
         <div class="form-group">
           <label class="field-label">Web3Forms Access Key (for Contact Form API submissions)</label>
           <input type="text" id="site-web3key" class="input-field" placeholder="Paste your Web3Forms access key here...">
@@ -1378,9 +1429,42 @@
             <label class="field-label" style="font-size: 16px; margin: 0;">Messages Inbox</label>
             <p style="font-size: 12px; color: var(--light-gray-70); margin-top: 4px;">View and manage contact messages submitted via your portfolio website form.</p>
           </div>
-          <button type="button" class="add-btn" style="margin: 0; background: linear-gradient(135deg, var(--orange-yellow-crayola) 0%, var(--vegas-gold) 100%); color: var(--eerie-black-1); font-weight: var(--fw-600); box-shadow: 0 4px 12px rgba(255, 219, 112, 0.15);" onclick="exportInquiriesToCSV()">
-            <ion-icon name="download-outline"></ion-icon> Export to CSV
-          </button>
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <button type="button" class="add-btn" style="margin: 0; border: 1px solid rgba(255, 219, 112, 0.2); background: rgba(255, 219, 112, 0.04); color: var(--orange-yellow-crayola);" onclick="createMockInquiry()">
+              <ion-icon name="bug-outline" style="font-size: 16px;"></ion-icon> Generate Test
+            </button>
+            <button type="button" class="add-btn" style="margin: 0; border: 1px solid var(--jet); background: transparent; color: var(--light-gray);" onclick="loadInquiries()">
+              <ion-icon name="refresh-outline" style="font-size: 16px;"></ion-icon> Refresh
+            </button>
+            <button type="button" class="add-btn" style="margin: 0; background: linear-gradient(135deg, var(--orange-yellow-crayola) 0%, var(--vegas-gold) 100%); color: var(--eerie-black-1); font-weight: var(--fw-600); box-shadow: 0 4px 12px rgba(255, 219, 112, 0.15);" onclick="exportInquiriesToCSV()">
+              <ion-icon name="download-outline"></ion-icon> Export to CSV
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Tabs and Search Bar -->
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 12px; flex-wrap: wrap;">
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="button" id="filter-inq-all" class="filter-tab active" onclick="setInquiryFilter('all')">
+              All Messages <span id="count-inq-all">0</span>
+            </button>
+            <button type="button" id="filter-inq-unread" class="filter-tab" onclick="setInquiryFilter('unread')">
+              Unread <span id="count-inq-unread">0</span>
+            </button>
+            <button type="button" id="filter-inq-starred" class="filter-tab" onclick="setInquiryFilter('starred')">
+              Starred <span id="count-inq-starred">0</span>
+            </button>
+            <button type="button" id="filter-inq-subscribers" class="filter-tab" onclick="setInquiryFilter('subscribers')">
+              Email Queue <span id="count-inq-subscribers">0</span>
+            </button>
+          </div>
+          <div style="position: relative; width: 100%; max-width: 320px; display: flex; align-items: center;">
+            <input type="text" id="search-inquiries" class="input-field" placeholder="Search sender, email, subject, body..." oninput="handleInquirySearch(this.value)" style="padding-left: 38px; padding-right: 32px; height: 38px; border-radius: 8px; margin: 0; font-size: 13.5px; border-color: rgba(255, 255, 255, 0.08); background: rgba(0,0,0,0.2); width: 100%;">
+            <ion-icon name="search-outline" style="position: absolute; left: 12px; color: var(--light-gray-70); font-size: 16px; pointer-events: none;"></ion-icon>
+            <button type="button" id="clear-search-btn" onclick="clearInquirySearch()" style="position: absolute; right: 10px; background: none; border: none; color: var(--light-gray-70); cursor: pointer; display: none; align-items: center; justify-content: center; padding: 4px; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--orange-yellow-crayola)';" onmouseout="this.style.background='none'; this.style.color='var(--light-gray-70)';">
+              <ion-icon name="close-circle" style="font-size: 16px;"></ion-icon>
+            </button>
+          </div>
         </div>
 
         <div id="inquiries-inbox" style="display: flex; flex-direction: column; gap: 15px; max-height: 70vh; overflow-y: auto; padding-right: 5px;">
@@ -1506,6 +1590,14 @@
         </div>
 
         <div class="form-group" style="margin-top: 30px;">
+          <label class="field-label">Admin Panel Email ID</label>
+          <input type="email" id="settings-admin-email" class="input-field" placeholder="e.g. admin@example.com">
+          <p style="font-size: 13px; color: var(--light-gray-70); margin-top: 8px;">
+            Set your Admin Panel email address here. Used to log in to the admin panel.
+          </p>
+        </div>
+
+        <div class="form-group" style="margin-top: 30px;">
           <label class="field-label">Admin Panel Password</label>
           <div class="password-input-group" style="position: relative; width: 100%;">
             <input type="password" id="settings-admin-password" class="input-field" placeholder="Enter new password..." style="padding-right: 50px;">
@@ -1514,7 +1606,7 @@
             </button>
           </div>
           <p style="font-size: 13px; color: var(--light-gray-70); margin-top: 8px;">
-            Set your Admin Panel password here. When you click **Save Configuration** (sticky bar at bottom), it will update `config.js` with your new password.
+            Set your Admin Panel password here. When you click **Save Configuration** (sticky bar at bottom), it will update `config.js` with your new email and password.
           </p>
         </div>
 
@@ -1573,12 +1665,17 @@
   <script src="data.js"></script>
 
   <script>
-    // Password Gate Actions
+    // Authentication Gate Actions
     function submitAuthentication() {
-      const input = document.getElementById('gate-password-input').value;
+      const emailInput = document.getElementById('gate-email-input').value.trim();
+      const passwordInput = document.getElementById('gate-password-input').value;
+      const savedEmail = window.ADMIN_EMAIL || (window.portfolioData && window.portfolioData.profile && window.portfolioData.profile.email) || "admin@example.com";
       const savedPass = window.ADMIN_PASSWORD || "admin123";
-      if (input === savedPass) {
+      
+      if (emailInput.toLowerCase() === savedEmail.toLowerCase() && passwordInput === savedPass) {
         sessionStorage.setItem('admin_authenticated', 'true');
+        sessionStorage.setItem('admin_email', emailInput);
+        sessionStorage.setItem('admin_password', passwordInput);
         document.documentElement.classList.add('authenticated');
         
         // Smooth fade out of overlay
@@ -1591,7 +1688,10 @@
         }
       } else {
         const errMsg = document.getElementById('gate-error-message');
-        if (errMsg) errMsg.style.display = 'block';
+        if (errMsg) {
+          errMsg.textContent = "Incorrect email ID or password! Please try again.";
+          errMsg.style.display = 'block';
+        }
         
         // Shake animation for card
         const card = document.querySelector('.password-card');
@@ -1639,25 +1739,35 @@
 
 
 
-    // Initialize password gate listeners
+    // Initialize auth gate listeners
     document.addEventListener('DOMContentLoaded', () => {
       // Clear session auth state on load so it prompts every time the page is loaded/opened
       sessionStorage.removeItem('admin_authenticated');
       
-      const input = document.getElementById('gate-password-input');
-      if (input) {
-        input.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter') {
-            submitAuthentication();
-          }
-        });
-        // Auto-focus field
-        setTimeout(() => input.focus(), 100);
+      const emailInput = document.getElementById('gate-email-input');
+      const passInput = document.getElementById('gate-password-input');
+      
+      const handleEnter = (e) => {
+        if (e.key === 'Enter') {
+          submitAuthentication();
+        }
+      };
+
+      if (emailInput) emailInput.addEventListener('keydown', handleEnter);
+      if (passInput) passInput.addEventListener('keydown', handleEnter);
+      
+      // Auto-focus email field
+      if (emailInput) {
+        setTimeout(() => emailInput.focus(), 100);
+      } else if (passInput) {
+        setTimeout(() => passInput.focus(), 100);
       }
       
-
-      
-      // Populate admin settings password
+      // Populate admin settings email & password
+      const settingsEmail = document.getElementById('settings-admin-email');
+      if (settingsEmail) {
+        settingsEmail.value = window.ADMIN_EMAIL || 'admin@example.com';
+      }
       const settingsPass = document.getElementById('settings-admin-password');
       if (settingsPass) {
         settingsPass.value = window.ADMIN_PASSWORD || 'admin123';
@@ -1830,6 +1940,11 @@
         icon.style.color = "var(--orange-yellow-crayola)";
         toast.style.borderColor = "rgba(255, 219, 112, 0.3)";
         title.textContent = "Success";
+      } else if (type === "info") {
+        icon.setAttribute("name", "information-circle");
+        icon.style.color = "#38bdf8";
+        toast.style.borderColor = "rgba(56, 189, 248, 0.3)";
+        title.textContent = "Processing";
       } else {
         icon.setAttribute("name", "alert-circle");
         icon.style.color = "var(--bittersweet-shimmer)";
@@ -1896,10 +2011,18 @@
 
     // INBOX INQUIRIES LOGIC
     let currentInquiries = [];
+    let inquirySearchQuery = '';
 
     function loadInquiries() {
       const inbox = document.getElementById('inquiries-inbox');
       if (!inbox) return;
+
+      // Reset search filter on load
+      inquirySearchQuery = '';
+      const searchInput = document.getElementById('search-inquiries');
+      if (searchInput) searchInput.value = '';
+      const clearBtn = document.getElementById('clear-search-btn');
+      if (clearBtn) clearBtn.style.display = 'none';
 
       inbox.innerHTML = `
         <div style="text-align: center; padding: 40px; color: var(--light-gray-70);">
@@ -1908,74 +2031,282 @@
         </div>
       `;
 
-      fetch('/api/inquiries')
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      const fetchPromise = isGoogleDriveMode && gdriveUrl
+        ? fetch(gdriveUrl + "?action=get-inquiries&password=" + encodeURIComponent(sessionStorage.getItem('admin_password') || ''))
+        : fetch('/api/inquiries');
+
+      fetchPromise
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           currentInquiries = data.inquiries || [];
           renderInquiries();
+        } else if (data && data.profile) {
+          inbox.innerHTML = `
+            <div style="text-align: center; padding: 25px; color: var(--orange-yellow-crayola); border: 1px dashed rgba(255, 219, 112, 0.3); border-radius: 12px; background: rgba(255, 219, 112, 0.02);">
+              <ion-icon name="cloud-upload-outline" style="font-size: 44px; color: var(--orange-yellow-crayola); margin-bottom: 12px;"></ion-icon>
+              <h4 style="color: var(--white-1); font-size: 15px; margin-bottom: 8px;">Google Apps Script Update Required</h4>
+              <p style="font-size: 13.5px; line-height: 1.5; color: var(--light-gray-70); max-width: 500px; margin: 0 auto 15px;">
+                Your currently deployed Google Apps Script Web App is out of date and returned the portfolio configuration instead of contact messages.
+              </p>
+              <p style="font-size: 13px; color: var(--light-gray);">
+                Please copy the new code from <strong>google-apps-script.js</strong> in your project folder, paste it into your script editor at <a href="https://script.google.com" target="_blank" style="color: var(--orange-yellow-crayola); text-decoration: underline;">script.google.com</a>, and deploy it as a <strong>New Deployment</strong> (Web App).
+              </p>
+            </div>
+          `;
         } else {
           inbox.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--bittersweet-shimmer);"><p>Error: ${data.error || 'Failed to fetch messages'}</p></div>`;
         }
       })
       .catch(err => {
         console.error(err);
-        inbox.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--bittersweet-shimmer);"><p>Error connecting to backend API. Please make sure the local Node server is running.</p></div>`;
+        const errorMsg = isGoogleDriveMode 
+          ? 'Error connecting to Google Drive API. Please verify your Web App URL and permissions.'
+          : 'Error connecting to backend API. Please make sure the local Node server is running.';
+        inbox.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--bittersweet-shimmer);"><p>${errorMsg}</p></div>`;
       });
+    }
+
+    // INBOX INQUIRIES FILTERING LOGIC
+    let currentInquiryFilter = 'all';
+
+    function setInquiryFilter(filterName) {
+      currentInquiryFilter = filterName;
+      document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`filter-inq-${filterName}`);
+      if (activeBtn) activeBtn.classList.add('active');
+      renderInquiries();
+    }
+
+    function handleInquirySearch(value) {
+      inquirySearchQuery = value.trim().toLowerCase();
+      const clearBtn = document.getElementById('clear-search-btn');
+      if (clearBtn) {
+        clearBtn.style.display = inquirySearchQuery ? 'flex' : 'none';
+      }
+      renderInquiries();
+    }
+
+    function clearInquirySearch() {
+      const searchInput = document.getElementById('search-inquiries');
+      if (searchInput) searchInput.value = '';
+      inquirySearchQuery = '';
+      const clearBtn = document.getElementById('clear-search-btn');
+      if (clearBtn) clearBtn.style.display = 'none';
+      renderInquiries();
+    }
+
+    function updateInquiryCounts() {
+      const standardInquiries = currentInquiries.filter(inq => inq.subject !== 'Newsletter / Launch Notification Request');
+      const subscribers = currentInquiries.filter(inq => inq.subject === 'Newsletter / Launch Notification Request');
+
+      const allCount = standardInquiries.length;
+      const unreadCount = standardInquiries.filter(inq => !inq.read).length;
+      const starredCount = standardInquiries.filter(inq => inq.starred).length;
+      const subscribersCount = subscribers.length;
+
+      const elAll = document.getElementById('count-inq-all');
+      if (elAll) elAll.textContent = allCount;
+
+      const elUnread = document.getElementById('count-inq-unread');
+      if (elUnread) elUnread.textContent = unreadCount;
+
+      const elStarred = document.getElementById('count-inq-starred');
+      if (elStarred) elStarred.textContent = starredCount;
+
+      const elSubscribers = document.getElementById('count-inq-subscribers');
+      if (elSubscribers) elSubscribers.textContent = subscribersCount;
     }
 
     function renderInquiries() {
       const inbox = document.getElementById('inquiries-inbox');
       if (!inbox) return;
 
-      if (currentInquiries.length === 0) {
+      updateInquiryCounts();
+
+      let filtered = [...currentInquiries];
+      if (currentInquiryFilter === 'subscribers') {
+        filtered = filtered.filter(inq => inq.subject === 'Newsletter / Launch Notification Request');
+      } else {
+        filtered = filtered.filter(inq => inq.subject !== 'Newsletter / Launch Notification Request');
+        if (currentInquiryFilter === 'unread') {
+          filtered = filtered.filter(inq => !inq.read);
+        } else if (currentInquiryFilter === 'starred') {
+          filtered = filtered.filter(inq => inq.starred);
+        }
+      }
+
+      if (inquirySearchQuery) {
+        filtered = filtered.filter(inq => {
+          const name = (inq.name || '').toLowerCase();
+          const email = (inq.email || '').toLowerCase();
+          const phone = (inq.phone || '').toLowerCase();
+          const subject = (inq.subject || '').toLowerCase();
+          const message = (inq.message || '').toLowerCase();
+          return name.includes(inquirySearchQuery) ||
+                 email.includes(inquirySearchQuery) ||
+                 phone.includes(inquirySearchQuery) ||
+                 subject.includes(inquirySearchQuery) ||
+                 message.includes(inquirySearchQuery);
+        });
+      }
+
+      if (filtered.length === 0) {
+        let emptyMessage = "Your inbox is empty. No messages submitted yet.";
+        let emptyIcon = "mail-open-outline";
+        if (inquirySearchQuery) {
+          emptyMessage = `No results found for "${inquirySearchQuery.replace(/</g, '&lt;').replace(/>/g, '&gt;')}".`;
+          emptyIcon = "search-outline";
+        } else if (currentInquiryFilter === 'unread') {
+          emptyMessage = "No unread messages. Good job!";
+          emptyIcon = "mail-outline";
+        } else if (currentInquiryFilter === 'starred') {
+          emptyMessage = "You haven't starred any messages yet.";
+          emptyIcon = "star-outline";
+        } else if (currentInquiryFilter === 'subscribers') {
+          emptyMessage = "No newsletter subscribers yet.";
+          emptyIcon = "people-outline";
+        }
+
         inbox.innerHTML = `
           <div style="text-align: center; padding: 50px; color: var(--light-gray-70); border: 1px dashed var(--jet); border-radius: 12px; background: rgba(255, 255, 255, 0.01);">
-            <ion-icon name="mail-open-outline" style="font-size: 48px; color: var(--onyx); margin-bottom: 15px;"></ion-icon>
-            <p style="font-size: 15px;">Your inbox is empty. No messages submitted yet.</p>
+            <ion-icon name="${emptyIcon}" style="font-size: 48px; color: var(--onyx); margin-bottom: 15px;"></ion-icon>
+            <p style="font-size: 15px;">${emptyMessage}</p>
           </div>
         `;
         return;
       }
 
-      // Sort: newest first
-      const sorted = [...currentInquiries].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      // Sort: starred messages pinned to top, then by timestamp descending
+      const sorted = [...filtered].sort((a, b) => {
+        if (a.starred && !b.starred) return -1;
+        if (!a.starred && b.starred) return 1;
+        return new Date(b.timestamp) - new Date(a.timestamp);
+      });
 
-      inbox.innerHTML = sorted.map(inq => {
+      let batchHtml = '';
+      if (currentInquiryFilter === 'subscribers') {
+        const pendingCount = sorted.filter(inq => !inq.notified).length;
+        if (pendingCount > 0) {
+          batchHtml = `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255, 219, 112, 0.05); border: 1px solid rgba(255, 219, 112, 0.15); padding: 15px 20px; border-radius: 12px; margin-bottom: 15px;">
+              <span style="font-size: 14px; color: var(--white-2);">There are <strong>${pendingCount}</strong> pending notification(s) in the queue.</span>
+              <button type="button" class="add-btn" style="margin: 0; background: linear-gradient(135deg, var(--orange-yellow-crayola) 0%, var(--vegas-gold) 100%); color: var(--eerie-black-1); font-weight: var(--fw-600); box-shadow: 0 4px 12px rgba(255, 219, 112, 0.15);" onclick="notifyAllSubscribers()">
+                <ion-icon name="paper-plane-outline" style="font-size: 16px; margin-right: 6px;"></ion-icon> Notify All Pending
+              </button>
+            </div>
+          `;
+        }
+      }
+
+      inbox.innerHTML = batchHtml + sorted.map(inq => {
         const dateStr = new Date(inq.timestamp).toLocaleString();
+
+        if (currentInquiryFilter === 'subscribers') {
+          const notified = inq.notified === true;
+          return `
+            <div class="list-card" style="padding: 24px; border: 1px solid ${!notified ? 'rgba(255, 219, 112, 0.3)' : 'rgba(255, 255, 255, 0.06)'}; background: ${!notified ? 'linear-gradient(135deg, rgba(255, 219, 112, 0.02) 0%, rgba(30, 41, 59, 0.3) 100%)' : 'linear-gradient(135deg, rgba(30, 41, 59, 0.2) 0%, rgba(15, 23, 42, 0.45) 100%)'}; border-radius: 16px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25); margin-bottom: 18px; transition: all 0.3s ease; position: relative;">
+              <div style="display: flex; gap: 16px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+                <div style="display: flex; gap: 16px; align-items: center; flex: 1; min-width: 280px;">
+                  <div style="width: 46px; height: 46px; border-radius: 50%; background: ${!notified ? 'rgba(255, 219, 112, 0.1)' : 'rgba(255, 255, 255, 0.04)'}; border: 1px solid ${!notified ? 'rgba(255, 219, 112, 0.25)' : 'rgba(255, 255, 255, 0.1)'}; color: ${!notified ? 'var(--orange-yellow-crayola)' : 'var(--light-gray)'}; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 15px; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);">
+                    <ion-icon name="person-outline" style="font-size: 20px;"></ion-icon>
+                  </div>
+                  <div>
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;">
+                      <a href="mailto:${inq.email}" style="color: var(--white-1); font-size: 16.5px; font-weight: var(--fw-600); text-decoration: none; border-bottom: 1px dashed rgba(255,255,255,0.2); transition: all 0.2s;" onmouseover="this.style.color='var(--orange-yellow-crayola)'; this.style.borderColor='var(--orange-yellow-crayola)'" onmouseout="this.style.color='var(--white-1)'; this.style.borderColor='rgba(255,255,255,0.2)'">
+                        ${inq.email}
+                      </a>
+                      ${notified 
+                        ? `<span style="background: rgba(34, 197, 94, 0.15); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 3px;"><ion-icon name="checkmark-circle" style="font-size:11px;"></ion-icon>Notified</span>` 
+                        : `<span style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 3px;"><ion-icon name="time-outline" style="font-size:11px;"></ion-icon>Pending Queue</span>`
+                      }
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--light-gray-70); margin-top: 6px; line-height: 1.3;">
+                      <span style="display: flex; align-items: center; gap: 4px;">
+                        <ion-icon name="calendar-outline" style="font-size: 14px; color: var(--orange-yellow-crayola);"></ion-icon>
+                        <span>Subscribed: ${dateStr}</span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                  <button type="button" class="add-btn" style="margin: 0; padding: 7px 14px; font-size: 12.5px; border-color: ${notified ? '#38bdf8' : 'var(--orange-yellow-crayola)'}; color: ${notified ? '#38bdf8' : 'var(--orange-yellow-crayola)'}; background: ${notified ? 'rgba(56, 189, 248, 0.02)' : 'rgba(255, 219, 112, 0.02)'};" onclick="notifySubscriber('${inq.id}')">
+                    <ion-icon name="${notified ? 'mail-unread-outline' : 'paper-plane-outline'}" style="font-size: 16px;"></ion-icon> ${notified ? 'Resend Email' : 'Send Notification'}
+                  </button>
+                  <button type="button" class="remove-btn" style="margin: 0; padding: 7px 14px; font-size: 12.5px; border-radius: 8px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.02); color: var(--bittersweet-shimmer); transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.borderColor='rgba(239, 68, 68, 0.5)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.02)'; this.style.borderColor='rgba(239, 68, 68, 0.3)'" onclick="updateInquiryStatus('${inq.id}', 'delete')">
+                    <ion-icon name="trash-outline" style="font-size: 15px;"></ion-icon> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
         const unread = !inq.read;
+        const initials = inq.name ? inq.name.trim().split(/\s+/).map(n => n[0]).join('').toUpperCase().slice(0, 2) : '?';
 
         return `
-          <div class="list-card" style="padding: 22px; border: 1px solid ${unread ? 'rgba(255, 219, 112, 0.3)' : 'var(--jet)'}; background: ${unread ? 'rgba(255, 219, 112, 0.02)' : 'var(--eerie-black-2)'}; transition: all 0.3s ease;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 15px; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 10px;">
-              <div>
-                <h4 style="color: var(--white-1); font-size: 16px; font-weight: var(--fw-600); display: flex; align-items: center; gap: 8px;">
-                  ${inq.name}
-                  ${unread ? `<span style="background: var(--orange-yellow-crayola); color: var(--eerie-black-1); font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase;">New</span>` : ''}
-                </h4>
-                <p style="font-size: 13px; color: var(--light-gray-70); margin-top: 2px;">
-                  <a href="mailto:${inq.email}" style="color: inherit; text-decoration: underline;">${inq.email}</a> 
-                  ${inq.phone ? ` • ${inq.phone}` : ''}
-                </p>
+          <div class="list-card" style="padding: 24px; border: 1px solid ${unread ? 'rgba(255, 219, 112, 0.3)' : 'rgba(255, 255, 255, 0.06)'}; background: ${unread ? 'linear-gradient(135deg, rgba(255, 219, 112, 0.02) 0%, rgba(30, 41, 59, 0.3) 100%)' : 'linear-gradient(135deg, rgba(30, 41, 59, 0.2) 0%, rgba(15, 23, 42, 0.45) 100%)'}; border-radius: 16px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25); margin-bottom: 18px; transition: all 0.3s ease; position: relative;">
+            <div style="display: flex; gap: 16px; align-items: flex-start; margin-bottom: 18px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 14px; flex-wrap: wrap;">
+              <div style="width: 46px; height: 46px; border-radius: 50%; background: ${unread ? 'rgba(255, 219, 112, 0.1)' : 'rgba(255, 255, 255, 0.04)'}; border: 1px solid ${unread ? 'rgba(255, 219, 112, 0.25)' : 'rgba(255, 255, 255, 0.1)'}; color: ${unread ? 'var(--orange-yellow-crayola)' : 'var(--light-gray)'}; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 15px; flex-shrink: 0; box-shadow: inset 0 2px 4px rgba(0,0,0,0.15);">
+                ${initials}
               </div>
-              <div style="text-align: right;">
-                <span style="font-size: 12px; color: var(--light-gray-70);">${dateStr}</span>
+              <div style="flex: 1; min-width: 200px;">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 4px;">
+                  <h4 style="color: var(--white-1); font-size: 16.5px; font-weight: var(--fw-600); margin: 0; line-height: 1.2;">
+                    ${inq.name}
+                  </h4>
+                  ${unread ? `<span style="background: var(--orange-yellow-crayola); color: var(--eerie-black-1); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;">New</span>` : ''}
+                  ${inq.starred ? `<span style="background: rgba(255, 219, 112, 0.15); color: var(--orange-yellow-crayola); border: 1px solid rgba(255, 219, 112, 0.3); font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; display: inline-flex; align-items: center; gap: 3px;"><ion-icon name="star" style="font-size:10px;"></ion-icon>Starred</span>` : ''}
+                </div>
+                <div style="display: flex; flex-wrap: wrap; gap: 12px; font-size: 13px; color: var(--light-gray-70); margin-top: 6px; line-height: 1.3;">
+                  <span style="display: flex; align-items: center; gap: 4px;">
+                    <ion-icon name="mail-outline" style="font-size: 14px; color: var(--orange-yellow-crayola);"></ion-icon>
+                    <a href="mailto:${inq.email}" style="color: inherit; text-decoration: underline; transition: color 0.2s;" onmouseover="this.style.color='var(--orange-yellow-crayola)'" onmouseout="this.style.color='inherit'">${inq.email}</a>
+                  </span>
+                  ${inq.phone ? `
+                    <span style="display: flex; align-items: center; gap: 4px;">
+                      <ion-icon name="call-outline" style="font-size: 14px; color: var(--orange-yellow-crayola);"></ion-icon>
+                      <a href="tel:${inq.phone}" style="color: inherit;">${inq.phone}</a>
+                    </span>
+                  ` : ''}
+                </div>
               </div>
-            </div>
-
-            <div style="margin-bottom: 15px;">
-              <div style="font-weight: 500; font-size: 14px; color: var(--white-2); margin-bottom: 6px;">Subject: ${inq.subject}</div>
-              <p style="color: var(--light-gray); font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; background: rgba(0,0,0,0.15); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.02);">${inq.message}</p>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; gap: 10px;">
-              ${unread ? `
-                <button type="button" class="add-btn" style="margin: 0; padding: 6px 12px; font-size: 12.5px; border-color: var(--orange-yellow-crayola); color: var(--orange-yellow-crayola);" onclick="updateInquiryStatus('${inq.id}', 'read')">
-                  <ion-icon name="checkmark-outline"></ion-icon> Mark Read
+              <div style="text-align: right; min-width: 150px; font-size: 12px; color: var(--light-gray-70); display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-top: 4px;">
+                <button type="button" style="background: none; border: none; cursor: pointer; color: ${inq.starred ? 'var(--orange-yellow-crayola)' : 'var(--light-gray-70)'}; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 50%; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='var(--orange-yellow-crayola)'" onmouseout="this.style.background='none'; this.style.color='${inq.starred ? 'var(--orange-yellow-crayola)' : 'var(--light-gray-70)'}'" onclick="toggleInquiryStar('${inq.id}', ${inq.starred === true})" title="${inq.starred ? 'Unstar Inquiry' : 'Star Inquiry'}">
+                  <ion-icon name="${inq.starred ? 'star' : 'star-outline'}" style="font-size: 19px;"></ion-icon>
                 </button>
-              ` : ''}
-              <button type="button" class="remove-btn" style="margin: 0; padding: 6px 12px; font-size: 12.5px;" onclick="updateInquiryStatus('${inq.id}', 'delete')">
-                <ion-icon name="trash-outline"></ion-icon> Delete
+                <span style="display: flex; align-items: center; gap: 4px;">
+                  <ion-icon name="calendar-outline" style="font-size: 14px; color: var(--orange-yellow-crayola);"></ion-icon>
+                  <span>${dateStr}</span>
+                </span>
+              </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+              <div style="font-weight: var(--fw-600); font-size: 14px; color: var(--white-1); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                <ion-icon name="bookmark-outline" style="color: var(--orange-yellow-crayola); font-size: 15px;"></ion-icon>
+                <span>Subject:</span> <span style="font-weight: var(--fw-400); color: var(--white-2);">${inq.subject}</span>
+              </div>
+              <div style="position: relative;">
+                <p style="color: var(--light-gray); font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; background: rgba(0, 0, 0, 0.25); padding: 15px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.04); border-left: 3px solid ${unread ? 'var(--orange-yellow-crayola)' : 'rgba(255, 255, 255, 0.2)'}; margin: 0; box-shadow: inset 0 2px 8px rgba(0,0,0,0.2); font-family: inherit;">${inq.message}</p>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255, 255, 255, 0.04); padding-top: 15px; flex-wrap: wrap;">
+              <a href="mailto:${inq.email}?subject=Re: ${encodeURIComponent(inq.subject)}&body=${encodeURIComponent('\n\n--- Original Message ---\nFrom: ' + inq.name + '\n' + inq.message)}" class="add-btn" style="margin: 0; padding: 7px 14px; font-size: 12.5px; border-color: #38bdf8; color: #38bdf8; background: rgba(56, 189, 248, 0.02); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: none;" onmouseover="this.style.background='rgba(56, 189, 248, 0.08)'" onmouseout="this.style.background='rgba(56, 189, 248, 0.02)'">
+                <ion-icon name="arrow-undo-outline" style="font-size: 16px;"></ion-icon> Reply
+              </a>
+              <button type="button" class="add-btn" style="margin: 0; padding: 7px 14px; font-size: 12.5px; border-color: var(--orange-yellow-crayola); color: var(--orange-yellow-crayola); background: rgba(255, 219, 112, 0.02);" onclick="updateInquiryStatus('${inq.id}', '${unread ? 'read' : 'unread'}')">
+                <ion-icon name="${unread ? 'checkmark-done-outline' : 'mail-outline'}" style="font-size: 16px;"></ion-icon> ${unread ? 'Mark Read' : 'Mark Unread'}
+              </button>
+              <button type="button" class="add-btn" style="margin: 0; padding: 7px 14px; font-size: 12.5px; border-color: var(--vegas-gold); color: var(--vegas-gold); background: transparent;" onclick="copyInquiryText('${inq.id}')">
+                <ion-icon name="copy-outline" style="font-size: 16px;"></ion-icon> Copy
+              </button>
+              <button type="button" class="remove-btn" style="margin: 0; padding: 7px 14px; font-size: 12.5px; border-radius: 8px; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.02); color: var(--bittersweet-shimmer); transition: all 0.2s;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.borderColor='rgba(239, 68, 68, 0.5)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.02)'; this.style.borderColor='rgba(239, 68, 68, 0.3)'" onclick="updateInquiryStatus('${inq.id}', 'delete')">
+                <ion-icon name="trash-outline" style="font-size: 15px;"></ion-icon> Delete
               </button>
             </div>
           </div>
@@ -1983,18 +2314,152 @@
       }).join('');
     }
 
+    function createMockInquiry() {
+      const mockNames = ["Aarav Sharma", "Ananya Patel", "John Doe", "Sophia Smith", "Rajesh Kumar"];
+      const mockEmails = ["aarav@example.com", "ananya@example.com", "john.doe@example.com", "sophia@example.com", "rajesh.k@example.com"];
+      const mockPhones = ["+91 94292 93754", "+91 99887 76655", "+1 (555) 019-2834", "+44 20 7946 0958", ""];
+      const mockSubjects = ["Partnership Proposal", "ERPNext Customization Quote", "Job Opportunity", "Bug Report in Contact Form", "Inquiry about Portfolio"];
+      const mockMessages = [
+        "Hello Dakshit,\n\nI saw your portfolio and was highly impressed by your expertise in the Frappe Framework and ERPNext. We have an upcoming real estate ERP project and would love to collaborate with you.\n\nBest regards,\nAarav Sharma",
+        "Hi there, could you please provide a rough estimate for customizing custom DocTypes and automating server-side workflows in ERPNext? Looking forward to hearing from you.",
+        "Hey! We have an open position for a Jr. Python / Frappe Developer at our tech firm in Ahmedabad. Your skills match our requirements perfectly. Let us know if you're interested in discussing this.",
+        "Hi Dakshit, I noticed that the 3D particle background doesn't initialize properly on Safari mobile. Just wanted to report this. Great portfolio overall!",
+        "Hello,\n\nI really like the clean design and dark mode aesthetic of your portfolio website. Could you tell me more about your experience at Nine Formula Retech?\n\nThanks!"
+      ];
+
+      const randomIndex = Math.floor(Math.random() * mockNames.length);
+      const mockPayload = {
+        action: 'submit-message',
+        fullname: mockNames[randomIndex],
+        email: mockEmails[randomIndex],
+        phone: mockPhones[randomIndex],
+        subject: mockSubjects[randomIndex],
+        message: mockMessages[randomIndex]
+      };
+
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      const fetchPromise = isGoogleDriveMode && gdriveUrl
+        ? fetch(gdriveUrl, {
+            method: 'POST',
+            mode: 'cors',
+            redirect: 'follow',
+            body: JSON.stringify(mockPayload)
+          })
+        : fetch('/api/submit-message', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              fullname: mockPayload.fullname,
+              email: mockPayload.email,
+              phone: mockPayload.phone,
+              subject: mockPayload.subject,
+              message: mockPayload.message
+            })
+          });
+
+      fetchPromise
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          showToast("Mock message generated successfully!");
+          loadInquiries();
+        } else {
+          showToast("Failed to create mock message: " + (data.error || "Unknown error"), "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showToast("Error connecting to server to create mock message", "error");
+      });
+    }
+
+    function copyInquiryText(id) {
+      const inq = currentInquiries.find(i => i.id === id);
+      if (!inq) return;
+      const textToCopy = `From: ${inq.name} <${inq.email}>\nPhone: ${inq.phone || 'N/A'}\nDate: ${new Date(inq.timestamp).toLocaleString()}\nSubject: ${inq.subject}\n\nMessage:\n${inq.message}`;
+      navigator.clipboard.writeText(textToCopy)
+        .then(() => showToast("Inquiry details copied to clipboard!"))
+        .catch(err => {
+          console.error(err);
+          showToast("Failed to copy text", "error");
+        });
+    }
+
+    function toggleInquiryStar(id, isStarred) {
+      const action = isStarred ? 'unstar' : 'star';
+      
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      const fetchPromise = isGoogleDriveMode && gdriveUrl
+        ? fetch(gdriveUrl, {
+            method: 'POST',
+            mode: 'cors',
+            redirect: 'follow',
+            body: JSON.stringify({
+              action: 'inquiries-update',
+              subAction: action,
+              id: id,
+              password: sessionStorage.getItem('admin_password') || ''
+            })
+          })
+        : fetch('/api/inquiries/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, action })
+          });
+
+      fetchPromise
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          currentInquiries = currentInquiries.map(inq => {
+            if (inq.id === id) {
+              inq.starred = !isStarred;
+            }
+            return inq;
+          });
+          showToast(isStarred ? "Message unstarred." : "Message starred!");
+          renderInquiries();
+        } else {
+          showToast(data.error || "Failed to update star status", "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showToast("Error communicating with server", "error");
+      });
+    }
+
     function updateInquiryStatus(id, action) {
       if (action === 'delete' && !confirm('Are you sure you want to delete this message?')) {
         return;
       }
 
-      fetch('/api/inquiries/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id, action })
-      })
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      const fetchPromise = isGoogleDriveMode && gdriveUrl
+        ? fetch(gdriveUrl, {
+            method: 'POST',
+            mode: 'cors',
+            redirect: 'follow',
+            body: JSON.stringify({
+              action: 'inquiries-update',
+              subAction: action,
+              id: id,
+              password: sessionStorage.getItem('admin_password') || ''
+            })
+          })
+        : fetch('/api/inquiries/update', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id, action })
+          });
+
+      fetchPromise
       .then(res => res.json())
       .then(data => {
         if (data.success) {
@@ -2004,6 +2469,12 @@
               return inq;
             });
             showToast("Message marked as read.");
+          } else if (action === 'unread') {
+            currentInquiries = currentInquiries.map(inq => {
+              if (inq.id === id) inq.read = false;
+              return inq;
+            });
+            showToast("Message marked as unread.");
           } else if (action === 'delete') {
             currentInquiries = currentInquiries.filter(inq => inq.id !== id);
             showToast("Message deleted successfully.");
@@ -2011,6 +2482,113 @@
           renderInquiries();
         } else {
           showToast(data.error || "Failed to update message status", "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showToast("Error communicating with server", "error");
+      });
+    }
+
+    function notifySubscriber(id) {
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      const siteUrl = window.portfolioData && window.portfolioData.settings && window.portfolioData.settings.siteUrl
+        ? window.portfolioData.settings.siteUrl
+        : (window.location.protocol + '//' + window.location.host);
+
+      showToast("Sending notification...", "info");
+
+      const fetchPromise = isGoogleDriveMode && gdriveUrl
+        ? fetch(gdriveUrl, {
+            method: 'POST',
+            mode: 'cors',
+            redirect: 'follow',
+            body: JSON.stringify({
+              action: 'send-single-email',
+              id: id,
+              siteUrl: siteUrl,
+              password: sessionStorage.getItem('admin_password') || ''
+            })
+          })
+        : fetch('/api/send-email-simulation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })
+          });
+
+      fetchPromise
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          currentInquiries = currentInquiries.map(inq => {
+            if (inq.id === id) inq.notified = true;
+            return inq;
+          });
+          showToast("Notification sent successfully!");
+          renderInquiries();
+        } else {
+          showToast(data.error || "Failed to send notification", "error");
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showToast("Error communicating with server", "error");
+      });
+    }
+
+    function notifyAllSubscribers() {
+      const pendingSubscribers = currentInquiries.filter(inq => inq.subject === 'Newsletter / Launch Notification Request' && !inq.notified);
+      if (pendingSubscribers.length === 0) {
+        showToast("No pending subscribers to notify.", "error");
+        return;
+      }
+
+      if (!confirm(`Are you sure you want to send notifications to all ${pendingSubscribers.length} pending subscribers?`)) {
+        return;
+      }
+
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      const siteUrl = window.portfolioData && window.portfolioData.settings && window.portfolioData.settings.siteUrl
+        ? window.portfolioData.settings.siteUrl
+        : (window.location.protocol + '//' + window.location.host);
+
+      showToast("Sending batch notifications...", "info");
+
+      const fetchPromise = isGoogleDriveMode && gdriveUrl
+        ? fetch(gdriveUrl, {
+            method: 'POST',
+            mode: 'cors',
+            redirect: 'follow',
+            body: JSON.stringify({
+              action: 'send-all-emails',
+              siteUrl: siteUrl,
+              password: sessionStorage.getItem('admin_password') || ''
+            })
+          })
+        : fetch('/api/send-all-emails-simulation', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+          });
+
+      fetchPromise
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          currentInquiries = currentInquiries.map(inq => {
+            if (inq.subject === 'Newsletter / Launch Notification Request') {
+              inq.notified = true;
+            }
+            return inq;
+          });
+          showToast("All pending subscribers notified successfully!");
+          renderInquiries();
+        } else {
+          showToast(data.error || "Failed to send batch notifications", "error");
         }
       })
       .catch(err => {
@@ -3082,6 +3660,7 @@
           siteOnline: document.getElementById('site-online').checked,
           siteTitle: document.getElementById('site-title').value.trim(),
           faviconUrl: document.getElementById('site-favicon').value.trim(),
+          siteUrl: window.location.protocol + '//' + window.location.host,
           web3FormsKey: document.getElementById('site-web3key').value.trim(),
           metaDescription: document.getElementById('site-metadesc').value.trim(),
           metaKeywords: document.getElementById('site-metakeys').value.trim(),
@@ -3288,29 +3867,61 @@
     }
 
     function saveSettingsConfig() {
-      if (!isLocalServerOnline) return;
-      
+      const adminEmail = document.getElementById('settings-admin-email').value.trim() || 'admin@example.com';
       const adminPass = document.getElementById('settings-admin-password').value.trim();
       const apiPref = document.getElementById('gdrive-url').value.trim();
       
-      fetch('/api/save-config', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          api_url: apiPref,
-          admin_password: adminPass || 'admin123'
+      if (isLocalServerOnline) {
+        fetch('/api/save-config', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            api_url: apiPref,
+            admin_password: adminPass || 'admin123',
+            admin_email: adminEmail
+          })
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          window.API_URL = apiPref;
-          window.ADMIN_PASSWORD = adminPass || 'admin123';
-        }
-      })
-      .catch(err => console.error("Failed to update config.js:", err));
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.API_URL = apiPref;
+            window.ADMIN_PASSWORD = adminPass || 'admin123';
+            window.ADMIN_EMAIL = adminEmail;
+            sessionStorage.setItem('admin_password', adminPass || 'admin123');
+            sessionStorage.setItem('admin_email', adminEmail);
+          }
+        })
+        .catch(err => console.error("Failed to update config.js:", err));
+      }
+
+      const gdriveUrl = localStorage.getItem('gdrive_api_url') || window.API_URL;
+      if (gdriveUrl) {
+        fetch(gdriveUrl, {
+          method: 'POST',
+          mode: 'cors',
+          redirect: 'follow',
+          body: JSON.stringify({
+            action: 'save-admin-config',
+            admin_password: adminPass || 'admin123',
+            admin_email: adminEmail,
+            password: sessionStorage.getItem('admin_password') || ''
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            window.API_URL = apiPref;
+            window.ADMIN_PASSWORD = adminPass || 'admin123';
+            window.ADMIN_EMAIL = adminEmail;
+            sessionStorage.setItem('admin_password', adminPass || 'admin123');
+            sessionStorage.setItem('admin_email', adminEmail);
+            showToast("Settings config updated on Google Drive!");
+          }
+        })
+        .catch(err => console.error("Failed to update Google Drive admin config:", err));
+      }
     }
 
     // Save changes function (Post request to G-Drive if configured, otherwise Express if online, otherwise download file)

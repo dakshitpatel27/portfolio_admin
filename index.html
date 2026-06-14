@@ -22,23 +22,61 @@
 
   <!-- Maintenance / Under Development Page -->
   <div id="maintenance-page" style="display: none; min-height: 100vh; justify-content: center; align-items: center; padding: 20px; z-index: 100; position: relative;">
-    <div class="content-card" style="max-width: 500px; width: 100%; text-align: center; padding: 40px 30px; border-radius: 20px; box-shadow: var(--shadow-5); background: var(--eerie-black-2); border: 1px solid var(--jet); display: flex; flex-direction: column; align-items: center; position: relative;">
-      <!-- Subtle lock button inside top right of card (no tooltip title) -->
-      <a href="admin.html" class="maintenance-admin-btn" style="position: absolute; top: 20px; right: 20px; color: var(--light-gray-70); font-size: 16px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--jet); box-shadow: var(--shadow-2); opacity: 0.35; transition: all 0.3s ease; text-decoration: none; z-index: 101;" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--orange-yellow-crayola)'; this.style.color='var(--orange-yellow-crayola)'" onmouseout="this.style.opacity='0.35'; this.style.borderColor='var(--jet)'; this.style.color='var(--light-gray-70)'">
+    <div class="maintenance-card">
+      <!-- Subtle lock button inside top right of card -->
+      <a href="admin.html" class="maintenance-admin-btn" style="position: absolute; top: 20px; right: 20px; color: var(--light-gray-70); font-size: 16px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); box-shadow: var(--shadow-2); opacity: 0.35; transition: all 0.3s ease; text-decoration: none; z-index: 101;" onmouseover="this.style.opacity='1'; this.style.borderColor='var(--orange-yellow-crayola)'; this.style.color='var(--orange-yellow-crayola)'" onmouseout="this.style.opacity='0.35'; this.style.borderColor='rgba(255, 255, 255, 0.06)'; this.style.color='var(--light-gray-70)'">
         <ion-icon name="lock-closed-outline"></ion-icon>
       </a>
-      <div class="maintenance-icon" style="font-size: 64px; color: var(--orange-yellow-crayola); margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
-        <ion-icon name="hammer-outline" style="animation: maintenance-bounce 2s infinite ease-in-out;"></ion-icon>
+
+      <!-- Premium Status Badge -->
+      <div class="maintenance-badge">
+        <span class="pulse-dot"></span>
+        <span>Maintenance Mode</span>
       </div>
-      <h1 class="h1" style="font-size: 28px; margin-bottom: 15px; color: var(--white-1);">Under Development</h1>
-      <p style="color: var(--light-gray); font-size: 15px; line-height: 1.6; margin-bottom: 25px;">
-        Dakshit's portfolio is currently undergoing updates to bring you a better experience. We'll be back online shortly!
-      </p>
+
+      <!-- Icon container -->
+      <div class="maintenance-icon" style="font-size: 58px; color: var(--orange-yellow-crayola); margin-bottom: 20px; display: flex; align-items: center; justify-content: center; z-index: 1;">
+        <ion-icon name="construct-outline" style="animation: maintenance-bounce 2s infinite ease-in-out;"></ion-icon>
+      </div>
+
+      <!-- Heading -->
+      <h1 class="h1" style="font-size: 28px; margin-bottom: 15px; color: var(--white-1); font-weight: 600; letter-spacing: -0.5px; z-index: 1; background: linear-gradient(135deg, var(--white-1) 30%, var(--light-gray) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Under Development</h1>
       
-      <!-- Socials or contacts so they can still reach out -->
-      <div class="separator" style="margin: 20px 0; width: 100%;"></div>
-      <h4 class="h4" style="font-size: 14px; color: var(--light-gray-70); margin-bottom: 12px; font-weight: var(--fw-500);">Connect with me:</h4>
-      <div class="maintenance-socials" id="maintenance-socials" style="display: flex; gap: 15px; justify-content: center; font-size: 24px;">
+      <!-- Description -->
+      <p style="color: var(--light-gray-70); font-size: 14.5px; line-height: 1.6; margin-bottom: 10px; max-width: 400px; z-index: 1;">
+        Dakshit's portfolio is currently undergoing scheduled backend upgrades to bring you an improved experience. We will be back online shortly!
+      </p>
+
+
+      <!-- Notify Me Form -->
+      <form id="maintenance-notify-form" onsubmit="submitNotificationRequest(event)" style="width: 100%; max-width: 340px; margin-top: 15px; z-index: 1;">
+        <div style="display: flex; gap: 8px; position: relative; width: 100%;">
+          <input type="email" id="notify-email" placeholder="Enter your email..." required 
+                 style="flex: 1; padding: 10px 14px; border-radius: 10px; font-size: 13.5px; border: 1px solid rgba(255, 255, 255, 0.08); background: rgba(0, 0, 0, 0.3); color: var(--white-1); outline: none; transition: border-color 0.25s ease;"
+                 onfocus="this.style.borderColor='var(--orange-yellow-crayola)'"
+                 onblur="this.style.borderColor='rgba(255, 255, 255, 0.08)'">
+          <button type="submit" id="notify-btn" 
+                  style="background: linear-gradient(135deg, var(--orange-yellow-crayola) 0%, var(--vegas-gold) 100%); color: var(--eerie-black-1); border: none; padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.25s ease; display: inline-flex; align-items: center; gap: 4px;"
+                  onmouseover="this.style.transform='scale(1.03)';"
+                  onmouseout="this.style.transform='scale(1)';"
+                  title="Notify Me">
+            <ion-icon name="notifications-outline" style="font-size: 14px;"></ion-icon>
+            <span>Notify Me</span>
+          </button>
+        </div>
+        <p id="notify-success-msg" style="color: var(--orange-yellow-crayola); font-size: 12.5px; margin-top: 8px; display: none; line-height: 1.4; text-align: left;">
+          <!-- Message text inserted dynamically -->
+        </p>
+      </form>
+      
+      <!-- Separator -->
+      <div class="separator" style="margin: 20px 0; width: 100%; opacity: 0.15; z-index: 1;"></div>
+      
+      <!-- Socials Heading -->
+      <h4 class="h4" style="font-size: 13.5px; color: var(--light-gray-70); margin-bottom: 16px; font-weight: 500; letter-spacing: 0.5px; text-transform: uppercase; z-index: 1;">Get in touch:</h4>
+      
+      <!-- Socials container -->
+      <div class="maintenance-socials" id="maintenance-socials" style="font-size: 20px;">
         <!-- Dynamically Rendered Social Links -->
       </div>
     </div>

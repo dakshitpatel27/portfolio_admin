@@ -294,6 +294,7 @@ window.portfolioData = {
   "settings": {
     "siteOnline": true,
     "siteTitle": "Dakshit Gajipara",
+    "siteUrl": "https://dakshit-gajipara.vercel.app",
     "faviconUrl": "./assets/images/logo.ico",
     "web3FormsKey": "1fe4ef89-0663-48b3-92b0-e26621a864b1",
     "metaDescription": "Dakshit Gajipara - Jr. Python Developer specializing in Frappe Framework, ERPNext, Django, and Web Development. View projects, experience, and contact details.",
@@ -315,11 +316,36 @@ window.portfolioData = {
     "contactForm": {
       "title": "Get in touch",
       "fields": [
-        { "type": "text", "name": "fullname", "placeholder": "Full name", "required": true },
-        { "type": "email", "name": "email", "placeholder": "Email address", "required": true },
-        { "type": "tel", "name": "phone", "placeholder": "Phone number", "required": false },
-        { "type": "text", "name": "subject", "placeholder": "Subject", "required": true },
-        { "type": "textarea", "name": "message", "placeholder": "Your Message", "required": true }
+        {
+          "type": "text",
+          "name": "fullname",
+          "placeholder": "Full name",
+          "required": true
+        },
+        {
+          "type": "email",
+          "name": "email",
+          "placeholder": "Email address",
+          "required": true
+        },
+        {
+          "type": "tel",
+          "name": "phone",
+          "placeholder": "Phone number",
+          "required": false
+        },
+        {
+          "type": "text",
+          "name": "subject",
+          "placeholder": "Subject",
+          "required": true
+        },
+        {
+          "type": "textarea",
+          "name": "message",
+          "placeholder": "Your Message",
+          "required": true
+        }
       ]
     },
     "github": {
