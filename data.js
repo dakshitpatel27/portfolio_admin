@@ -15,7 +15,28 @@ window.portfolioData = {
       "linkedin": "https://www.linkedin.com/in/dakshgajipara2707",
       "github": "https://github.com/dakshitpatel27",
       "instagram": "https://www.instagram.com/dakshit_01_?igsh=MWprYXo1aTVxM2x6Ng=="
-    }
+    },
+    "socialsList": [
+      {
+        "platform": "linkedin",
+        "url": "https://www.linkedin.com/in/dakshgajipara2707"
+      },
+      {
+        "platform": "github",
+        "url": "https://github.com/dakshitpatel27"
+      },
+      {
+        "platform": "instagram",
+        "url": "https://www.instagram.com/dakshit_01_?igsh=MWprYXo1aTVxM2x6Ng=="
+      }
+    ],
+    "roleAnimationEnabled": true,
+    "rolesList": [
+      "Jr. Python Developer",
+      "Frappe & ERPNext Developer",
+      "Backend Engineer",
+      "Tech Enthusiast"
+    ]
   },
   "about": {
     "paragraphs": [
@@ -141,43 +162,82 @@ window.portfolioData = {
       "title": "Student Performance Tracking System",
       "category": "Python , Frappe & Javascript Development",
       "image": "./assets/images/project-7.jpg",
-      "link": "#"
+      "link": "#",
+      "status": "Completed",
+      "featured": false,
+      "sortOrder": 0
     },
     {
       "title": "Smart Parking Management",
       "category": "ReactJS & Django Development",
       "image": "./assets/images/project-1.jpg",
-      "link": "#"
+      "link": "#",
+      "status": "Completed",
+      "featured": false,
+      "sortOrder": 1
     },
     {
       "title": "Food Delivery System",
       "category": "Python Development",
       "image": "./assets/images/project-2.png",
-      "link": "#"
+      "link": "#",
+      "status": "Completed",
+      "featured": false,
+      "sortOrder": 2
     },
     {
       "title": "Hostel Management System",
       "category": "ReactJS & Django Development",
       "image": "./assets/images/project-3.jpg",
-      "link": "#"
+      "link": "#",
+      "status": "Completed",
+      "featured": false,
+      "sortOrder": 3
     },
     {
       "title": "Weather Information",
       "category": "Front-End Development",
       "image": "./assets/images/project-4.png",
-      "link": "https://dakshitpatel27.github.io/Weather-Website/"
+      "link": "https://dakshitpatel27.github.io/Weather-Website/",
+      "status": "Completed",
+      "featured": false,
+      "sortOrder": 4
     },
     {
       "title": "E-Learning Website",
       "category": "Front-End Development",
       "image": "./assets/images/project-5.png",
-      "link": "https://dakshitpatel27.github.io/E-Learning/"
+      "link": "https://dakshitpatel27.github.io/E-Learning/",
+      "status": "Completed",
+      "featured": false,
+      "sortOrder": 5
     },
     {
       "title": "Connect 4-Dot Game",
       "category": "Front-End Development",
       "image": "./assets/images/project-6.png",
-      "link": "https://dakshitpatel27.github.io/connect4dotgame/"
+      "link": "https://dakshitpatel27.github.io/connect4dotgame/",
+      "status": "Completed",
+      "featured": false,
+      "sortOrder": 6
+    }
+  ],
+  "achievements": [
+    {
+      "title": "Hackathon Winner",
+      "description": "Secured 1st place in the local university Web3 Hackathon.",
+      "date": "March 2026",
+      "image": "./assets/images/award.png"
+    }
+  ],
+  "blogs": [
+    {
+      "title": "Getting Started with Frappe Framework",
+      "content": "<p>Frappe is a full-stack, battery-included Python web framework...</p>",
+      "tags": "Python, Frappe, ERPNext",
+      "image": "./assets/images/blog-1.png",
+      "date": "2026-06-14",
+      "status": "published"
     }
   ],
   "certifications": [
@@ -230,5 +290,109 @@ window.portfolioData = {
       "title": "Microsoft Azure Management Tools and Security Solutions (Microsoft)",
       "link": "https://coursera.org/verify/BSG8AUK6M4WK"
     }
-  ]
+  ],
+  "settings": {
+    "siteOnline": true,
+    "siteTitle": "Dakshit Gajipara",
+    "faviconUrl": "./assets/images/logo.ico",
+    "web3FormsKey": "1fe4ef89-0663-48b3-92b0-e26621a864b1",
+    "metaDescription": "Dakshit Gajipara - Jr. Python Developer specializing in Frappe Framework, ERPNext, Django, and Web Development. View projects, experience, and contact details.",
+    "metaKeywords": "Dakshit Gajipara, Python Developer, Frappe Framework, ERPNext, Django, Web Developer, Java, SQL, Portfolio",
+    "visibility": {
+      "resume": true,
+      "projects": true,
+      "achievements": true,
+      "blogs": true,
+      "certifications": true,
+      "contact": true
+    },
+    "background3d": {
+      "enabled": true,
+      "particleCount": 120,
+      "connectionDistance": 110,
+      "particleSize": 4.5
+    },
+    "contactForm": {
+      "title": "Get in touch",
+      "fields": [
+        { "type": "text", "name": "fullname", "placeholder": "Full name", "required": true },
+        { "type": "email", "name": "email", "placeholder": "Email address", "required": true },
+        { "type": "tel", "name": "phone", "placeholder": "Phone number", "required": false },
+        { "type": "text", "name": "subject", "placeholder": "Subject", "required": true },
+        { "type": "textarea", "name": "message", "placeholder": "Your Message", "required": true }
+      ]
+    },
+    "github": {
+      "username": "dakshitpatel27",
+      "statsEnabled": true,
+      "languagesEnabled": true,
+      "theme": "dark"
+    },
+    "testimonialsEnabled": true,
+    "testimonials": [
+      {
+        "name": "Nirav Patel",
+        "role": "Senior Frappe Developer",
+        "company": "Nine Formula Retech LLP",
+        "avatar": "./assets/images/avatar-1.png",
+        "content": "Dakshit is an exceptionally talented Python and Frappe developer. He picks up complex concepts quickly and delivers high-quality work on time."
+      },
+      {
+        "name": "Sanjay Shah",
+        "role": "Project Manager",
+        "company": "Sigzen Technologies",
+        "avatar": "./assets/images/avatar-2.png",
+        "content": "Working with Dakshit was a great experience. His dedication to backend workflow automations and database optimizations was highly impressive."
+      }
+    ]
+  },
+  "chatbot": {
+    "title": "Chat Bot",
+    "subtitle": "Online • Ask about me",
+    "welcomeMessage": "<p>Hi there! I am <strong>Dakshit's</strong> AI assistant.</p><p>I can help answer questions about his skills, experience, projects, education, or how to contact him. What would you like to know?</p>",
+    "suggestions": [
+      {
+        "label": "👋 About Me",
+        "query": "Tell me about yourself"
+      },
+      {
+        "label": "💻 Skills",
+        "query": "What are your skills?"
+      },
+      {
+        "label": "🚀 Projects",
+        "query": "Show me your projects"
+      },
+      {
+        "label": "💼 Work Experience",
+        "query": "Tell me about your experience"
+      },
+      {
+        "label": "🎓 Education",
+        "query": "Where did you study?"
+      },
+      {
+        "label": "📜 Certifications",
+        "query": "Show me your certifications"
+      },
+      {
+        "label": "📞 Contact Info",
+        "query": "How can I contact you?"
+      },
+      {
+        "label": "📄 Download CV",
+        "query": "How can I download your CV?"
+      }
+    ],
+    "customQAs": [
+      {
+        "keywords": "hobbies, hobby, interests",
+        "response": "<p>In his free time, Dakshit enjoys reading tech blogs, practicing coding challenges on LeetCode, and exploring open-source projects.</p>"
+      },
+      {
+        "keywords": "frameworks, libraries, backend",
+        "response": "<p>Dakshit specializes in the **Frappe Framework** and **ERPNext**. He also has experience working with backend frameworks like **Django** and **Node.js**.</p>"
+      }
+    ]
+  }
 };

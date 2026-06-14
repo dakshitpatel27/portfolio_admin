@@ -3,9 +3,13 @@
   let scene, camera, renderer;
   let particles = [];
   let lineGeometry, lineMesh;
-  const maxParticles = 120;
-  const maxDistance = 110;
   let currentMode = 'about';
+
+  const bgConfig = (window.portfolioData && window.portfolioData.settings && window.portfolioData.settings.background3d) || {};
+  const maxParticles = typeof bgConfig.particleCount === 'number' ? bgConfig.particleCount : 120;
+  const maxDistance = typeof bgConfig.connectionDistance === 'number' ? bgConfig.connectionDistance : 110;
+  const particleSize = typeof bgConfig.particleSize === 'number' ? bgConfig.particleSize : 4.5;
+  const isEnabled = bgConfig.enabled !== false;
   
   // Mouse interaction
   let mouseX = 0;
@@ -50,6 +54,11 @@
   function init() {
     const container = document.getElementById('three-bg');
     if (!container) return;
+
+    if (!isEnabled) {
+      container.style.display = 'none';
+      return;
+    }
 
     // Scene
     scene = new THREE.Scene();
@@ -100,7 +109,7 @@
 
     // Material for particles
     const particleMaterial = new THREE.PointsMaterial({
-      size: 4.5,
+      size: particleSize,
       map: texture,
       vertexColors: true,
       transparent: true,
@@ -143,6 +152,7 @@
   }
 
   function onWindowResize() {
+    if (!camera || !renderer) return;
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -244,6 +254,8 @@
   };
 
   function render() {
+    if (!scene || !camera || !renderer) return;
+
     // Parallax effect: camera target moves based on mouse
     targetX = mouseX * 80;
     targetY = -mouseY * 80;

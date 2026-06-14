@@ -92,6 +92,118 @@ app.get('/api/status', (req, res) => {
   res.json({ success: true, online: true });
 });
 
+// Local Inquiries store path
+const inquiriesFilePath = path.join(__dirname, 'inquiries.json');
+
+// Helper to read inquiries safely
+const readInquiries = () => {
+  try {
+    if (!fs.existsSync(inquiriesFilePath)) {
+      return [];
+    }
+    const data = fs.readFileSync(inquiriesFilePath, 'utf8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error reading inquiries:', error);
+    return [];
+  }
+};
+
+// Helper to write inquiries safely
+const writeInquiries = (data) => {
+  try {
+    fs.writeFileSync(inquiriesFilePath, JSON.stringify(data, null, 2), 'utf8');
+    return true;
+  } catch (error) {
+    console.error('Error writing inquiries:', error);
+    return false;
+  }
+};
+
+// 1. Submit message API
+app.post('/api/submit-message', (req, res) => {
+  try {
+    const { name, fullname, email, phone, subject, message } = req.body;
+    const inquiries = readInquiries();
+    
+    const newInquiry = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+      name: fullname || name || 'Anonymous',
+      email: email || '',
+      phone: phone || '',
+      subject: subject || 'No Subject',
+      message: message || '',
+      timestamp: new Date().toISOString(),
+      read: false
+    };
+
+    inquiries.push(newInquiry);
+    if (writeInquiries(inquiries)) {
+      res.json({ success: true, inquiry: newInquiry });
+    } else {
+      res.status(500).json({ success: false, error: 'Failed to write inquiry database' });
+    }
+  } catch (error) {
+    console.error('Error submitting message:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+// 2. Fetch inquiries API
+app.get('/api/inquiries', (req, res) => {
+  try {
+    const inquiries = readInquiries();
+    res.json({ success: true, inquiries });
+  } catch (error) {
+    console.error('Error fetching inquiries:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+// 3. Update inquiry status or delete API
+app.post('/api/inquiries/update', (req, res) => {
+  try {
+    const { id, action } = req.body;
+    if (!id || !action) {
+      return res.status(400).json({ success: false, error: 'Missing id or action' });
+    }
+
+    let inquiries = readInquiries();
+    let updated = false;
+
+    if (action === 'read') {
+      inquiries = inquiries.map(inq => {
+        if (inq.id === id) {
+          inq.read = true;
+          updated = true;
+        }
+        return inq;
+      });
+    } else if (action === 'delete') {
+      const initialLength = inquiries.length;
+      inquiries = inquiries.filter(inq => inq.id !== id);
+      if (inquiries.length !== initialLength) {
+        updated = true;
+      }
+    } else {
+      return res.status(400).json({ success: false, error: 'Invalid action' });
+    }
+
+    if (updated) {
+      if (writeInquiries(inquiries)) {
+        res.json({ success: true });
+      } else {
+        res.status(500).json({ success: false, error: 'Failed to save updated inquiries' });
+      }
+    } else {
+      res.status(404).json({ success: false, error: 'Inquiry not found' });
+    }
+  } catch (error) {
+    console.error('Error updating inquiry:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
 // Route for clean admin URL
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'admin.html'));

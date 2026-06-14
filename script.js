@@ -220,9 +220,124 @@ function renderPortfolio(data) {
     return;
   }
 
+  // Handle Maintenance / Under Development Mode
+  const maintenancePage = document.getElementById('maintenance-page');
+  const mainWrapper = document.querySelector('main');
+  const chatbotToggle = document.getElementById('chatbot-toggle');
+  
+  if (data.settings && data.settings.siteOnline === false) {
+    if (maintenancePage) maintenancePage.style.display = 'flex';
+    if (mainWrapper) mainWrapper.style.display = 'none';
+    if (chatbotToggle) chatbotToggle.style.display = 'none';
+    
+    // Render dynamic socials on maintenance page
+    const list = data.profile?.socialsList || [];
+    const maintenanceSocials = document.getElementById('maintenance-socials');
+    if (maintenanceSocials && list.length > 0) {
+      maintenanceSocials.innerHTML = list.map(soc => {
+        const platform = soc.platform.toLowerCase();
+        const icon = platform === 'custom' || platform === 'website' ? 'globe-outline' : `logo-${platform}`;
+        return `<a href="${soc.url}" target="_blank" style="color: var(--light-gray-70); transition: color 0.3s;" onmouseover="this.style.color='var(--orange-yellow-crayola)'" onmouseout="this.style.color='var(--light-gray-70)'"><ion-icon name="${icon}"></ion-icon></a>`;
+      }).join('');
+    }
+    
+    // Set minimal meta info (Title & Favicon) even in maintenance mode
+    if (data.settings.siteTitle) {
+      document.title = data.settings.siteTitle;
+    }
+    if (data.settings.faviconUrl) {
+      let link = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'shortcut icon';
+        link.type = 'image/x-icon';
+        document.head.appendChild(link);
+      }
+      link.href = data.settings.faviconUrl;
+    }
+    return;
+  } else {
+    if (maintenancePage) maintenancePage.style.display = 'none';
+    if (mainWrapper) mainWrapper.style.display = '';
+    if (chatbotToggle && (!data.theme || data.theme.chatbotEnabled !== false)) {
+      chatbotToggle.style.display = '';
+    }
+  }
+
   // Apply Theme configuration if available
   if (data.theme) {
     applyTheme(data.theme);
+  }
+
+  // Apply Site Settings (Title & Favicon)
+  if (data.settings) {
+    if (data.settings.siteTitle) {
+      document.title = data.settings.siteTitle;
+    } else if (data.profile && data.profile.name) {
+      document.title = data.profile.name;
+    }
+    
+    if (data.settings.faviconUrl) {
+      let link = document.querySelector("link[rel*='icon']");
+      if (!link) {
+        link = document.createElement('link');
+        link.rel = 'shortcut icon';
+        link.type = 'image/x-icon';
+        document.head.appendChild(link);
+      }
+      link.href = data.settings.faviconUrl;
+    }
+
+    if (data.settings.metaDescription) {
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.name = 'description';
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.content = data.settings.metaDescription;
+    }
+    if (data.settings.metaKeywords) {
+      let metaKeys = document.querySelector('meta[name="keywords"]');
+      if (!metaKeys) {
+        metaKeys = document.createElement('meta');
+        metaKeys.name = 'keywords';
+        document.head.appendChild(metaKeys);
+      }
+      metaKeys.content = data.settings.metaKeywords;
+    }
+  } else if (data.profile && data.profile.name) {
+    document.title = data.profile.name;
+  }
+
+  // Apply Section Visibility Toggles
+  if (data.settings && data.settings.visibility) {
+    const vis = data.settings.visibility;
+    document.querySelectorAll('[data-nav-item]').forEach(li => {
+      const item = li.getAttribute('data-nav-item');
+      if (item && item !== 'about') {
+        const isVisible = vis[item] !== false;
+        li.style.display = isVisible ? 'block' : 'none';
+      }
+    });
+
+    const activePage = document.querySelector('article.active');
+    if (activePage) {
+      const activeName = activePage.dataset.page;
+      const sectionKey = activeName === 'portfolio' ? 'projects' : activeName;
+      if (sectionKey && vis[sectionKey] === false) {
+        showPage('about');
+        document.querySelectorAll("[data-nav-link]").forEach(btn => {
+          const label = btn.textContent.trim().toLowerCase();
+          const targetName = navMap[label] || label;
+          if (targetName === 'about') {
+            btn.classList.add('active');
+          } else {
+            btn.classList.remove('active');
+          }
+        });
+      }
+    }
   }
 
   // Render Profile / Sidebar
@@ -233,13 +348,43 @@ function renderPortfolio(data) {
 
   const profileTitleContainer = document.getElementById('profile-title-container');
   if (profileTitleContainer && data.profile) {
+    const isAnim = data.profile.roleAnimationEnabled;
+    const roleHTML = isAnim 
+      ? `<span class="role-text-typing"></span><span class="typing-cursor">|</span>`
+      : data.profile.role;
+
     profileTitleContainer.innerHTML = `
       <h1 class="name">${data.profile.name}</h1>
       <div class="role">
-        ${data.profile.role}
+        ${roleHTML}
         <div>@${data.profile.company}</div>
       </div>
     `;
+
+    // Inject typing cursor style
+    if (isAnim && !document.getElementById('typing-cursor-styles')) {
+      const style = document.createElement('style');
+      style.id = 'typing-cursor-styles';
+      style.textContent = `
+        .typing-cursor {
+          animation: blinkCursor 0.8s infinite;
+          color: var(--orange-yellow-crayola);
+          margin-left: 2px;
+          font-weight: 600;
+          vertical-align: middle;
+          display: inline-block;
+        }
+        @keyframes blinkCursor {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    if (isAnim && Array.isArray(data.profile.rolesList) && data.profile.rolesList.length > 0) {
+      startRoleTypingAnimation(data.profile.rolesList);
+    }
   }
 
   const contactsContainer = document.getElementById('contacts-list-container');
@@ -276,25 +421,39 @@ function renderPortfolio(data) {
     `;
   }
 
+  const mapOldSocials = (socials) => {
+    if (!socials) return [];
+    const list = [];
+    if (socials.linkedin) list.push({ platform: 'linkedin', url: socials.linkedin });
+    if (socials.github) list.push({ platform: 'github', url: socials.github });
+    if (socials.instagram) list.push({ platform: 'instagram', url: socials.instagram });
+    return list;
+  };
+
   const socialsContainer = document.getElementById('socials-container');
-  if (socialsContainer && data.profile && data.profile.socials) {
-    socialsContainer.innerHTML = `
-      <li class="social-item">
-        <a href="${data.profile.socials.linkedin}" class="social-link" target="_blank">
-          <ion-icon name="logo-linkedin"></ion-icon>
-        </a>
-      </li>
-      <li class="social-item">
-        <a href="${data.profile.socials.github}" class="social-link" target="_blank">
-          <ion-icon name="logo-github"></ion-icon>
-        </a>
-      </li>
-      <li class="social-item">
-        <a href="${data.profile.socials.instagram}" class="social-link" target="_blank">
-          <ion-icon name="logo-instagram"></ion-icon>
-        </a>
-      </li>
-    `;
+  if (socialsContainer && data.profile) {
+    const list = data.profile.socialsList || mapOldSocials(data.profile.socials);
+    socialsContainer.innerHTML = list.map(soc => {
+      const platform = soc.platform.toLowerCase();
+      const icon = platform === 'custom' || platform === 'website' ? 'globe-outline' : `logo-${platform}`;
+      return `
+        <li class="social-item">
+          <a href="${soc.url}" class="social-link" target="_blank">
+            <ion-icon name="${icon}"></ion-icon>
+          </a>
+        </li>
+      `;
+    }).join('');
+  }
+
+  const footerSocials = document.querySelector('.footer-socials');
+  if (footerSocials && data.profile) {
+    const list = data.profile.socialsList || mapOldSocials(data.profile.socials);
+    footerSocials.innerHTML = list.map(soc => {
+      const platform = soc.platform.toLowerCase();
+      const icon = platform === 'custom' || platform === 'website' ? 'globe-outline' : `logo-${platform}`;
+      return `<a href="${soc.url}" target="_blank"><ion-icon name="${icon}"></ion-icon></a>`;
+    }).join('');
   }
 
   // Render About Me text
@@ -317,6 +476,36 @@ function renderPortfolio(data) {
         </div>
       </li>
     `).join('');
+  }
+
+  // Render Testimonials List
+  const testimonialsSection = document.getElementById('testimonials-section');
+  if (testimonialsSection) {
+    const isEnabled = data.settings ? data.settings.testimonialsEnabled !== false : true;
+    const testimonials = (data.settings && data.settings.testimonials) || [];
+    
+    if (isEnabled && Array.isArray(testimonials) && testimonials.length > 0) {
+      testimonialsSection.style.display = 'block';
+      const testimonialsContainer = document.getElementById('testimonials-container');
+      if (testimonialsContainer) {
+        testimonialsContainer.innerHTML = testimonials.map(t => `
+          <li class="testimonials-item">
+            <div class="content-card" data-testimonials-item style="cursor: pointer;">
+              <figure class="testimonials-avatar-box">
+                <img src="${t.avatar || './assets/images/avatar-1.png'}" alt="${t.name}" width="60" data-testimonials-avatar>
+              </figure>
+              <h4 class="h4 testimonials-item-title" data-testimonials-title>${t.name}</h4>
+              <p class="testimonials-company" style="font-size: 12px; color: var(--light-gray-70); margin-top: -4px; margin-bottom: 8px;">${t.role || ''} at ${t.company || ''}</p>
+              <div class="testimonials-text" data-testimonials-text>
+                <p>${t.content}</p>
+              </div>
+            </div>
+          </li>
+        `).join('');
+      }
+    } else {
+      testimonialsSection.style.display = 'none';
+    }
   }
 
   // Render Experience list
@@ -402,10 +591,30 @@ function renderPortfolio(data) {
   const certificationsContainer = document.getElementById('certifications-container');
   if (certificationsContainer && data.certifications) {
     certificationsContainer.innerHTML = data.certifications.map(cert => `
-      <li>
-        ${cert.title} — 
-        <a href="${cert.link}" target="_blank">View Certificate</a>
-        ${cert.badge ? `- <a href="${cert.badge}" target="_blank"> Verify Badge</a>` : ''}
+      <li class="certification-item">
+        <div class="content-card" style="padding: 20px; border-radius: 14px; border: 1px solid var(--jet); background: var(--bg-gradient-jet); display: flex; flex-direction: column; justify-content: space-between; height: 100%; gap: 15px; cursor: default;">
+          <div style="display: flex; align-items: flex-start; gap: 15px;">
+            <div class="certification-icon-wrapper" style="width: 48px; height: 48px; border-radius: 8px; background: rgba(255, 219, 112, 0.05); border: 1px solid rgba(255, 219, 112, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+              <ion-icon name="ribbon-outline" style="font-size: 24px; color: var(--orange-yellow-crayola);"></ion-icon>
+            </div>
+            <div>
+              <h4 class="h4 certification-item-title" style="color: var(--white-1); font-size: 15px; margin-bottom: 4px; font-weight: var(--fw-600); line-height: 1.4;">${cert.title}</h4>
+              <p style="color: var(--light-gray-70); font-size: 12px; margin: 0;">Verified Certification</p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: auto; flex-wrap: wrap;">
+            <a href="${cert.link}" target="_blank" class="form-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; text-decoration: none; width: auto; font-size: 13px; font-weight: 500; font-family: inherit;">
+              <ion-icon name="eye-outline"></ion-icon>
+              <span>View Certificate</span>
+            </a>
+            ${cert.badge ? `
+              <a href="${cert.badge}" target="_blank" class="form-btn" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; text-decoration: none; width: auto; font-size: 13px; font-weight: 500; font-family: inherit; background: transparent !important; color: var(--orange-yellow-crayola) !important; border: 1px solid var(--orange-yellow-crayola); box-shadow: none;">
+                <ion-icon name="checkmark-circle-outline"></ion-icon>
+                <span>Verify Badge</span>
+              </a>
+            ` : ''}
+          </div>
+        </div>
       </li>
     `).join('');
   }
@@ -413,10 +622,25 @@ function renderPortfolio(data) {
   // Render Projects list
   const projectsContainer = document.getElementById('projects-container');
   if (projectsContainer && data.projects) {
-    projectsContainer.innerHTML = data.projects.map(project => `
+    const sortedProjects = [...data.projects].sort((a, b) => {
+      const orderA = typeof a.sortOrder === 'number' ? a.sortOrder : 9999;
+      const orderB = typeof b.sortOrder === 'number' ? b.sortOrder : 9999;
+      return orderA - orderB;
+    });
+
+    projectsContainer.innerHTML = sortedProjects.map(project => `
       <li class="project-item active" data-filter-item data-category="${project.category.toLowerCase()}">
         <a href="${project.link}" ${project.link !== '#' ? 'target="_blank"' : ''}>
-          <figure class="project-img">
+          <figure class="project-img" style="position: relative;">
+            ${project.featured === true || project.featured === 'true' ? `
+              <div class="project-featured-badge" style="position: absolute; top: 12px; left: 12px; background: var(--orange-yellow-crayola); color: var(--eerie-black-1); font-size: 10px; font-weight: var(--fw-600); padding: 3px 8px; border-radius: 20px; display: flex; align-items: center; gap: 3px; z-index: 2; box-shadow: var(--shadow-1);">
+                <ion-icon name="star"></ion-icon>
+                <span>Featured</span>
+              </div>
+            ` : ''}
+            <div class="project-status-badge" style="position: absolute; top: 12px; right: 12px; background: ${project.status === 'In Progress' ? 'rgba(249, 115, 22, 0.9)' : 'rgba(52, 211, 153, 0.9)'}; color: #0b0c10; font-size: 10px; font-weight: var(--fw-600); padding: 3px 8px; border-radius: 20px; z-index: 2; box-shadow: var(--shadow-1);">
+              <span>${project.status || 'Completed'}</span>
+            </div>
             <div class="project-item-icon-box"><ion-icon name="eye-outline"></ion-icon></div>
             <img src="${project.image}" alt="${project.title}">
           </figure>
@@ -426,6 +650,176 @@ function renderPortfolio(data) {
       </li>
     `).join('');
   }
+
+  // Render Achievements list
+  const achievementsContainer = document.getElementById('achievements-container');
+  if (achievementsContainer) {
+    if (data.achievements && data.achievements.length > 0) {
+      achievementsContainer.innerHTML = data.achievements.map(award => {
+        const hasImg = award.image && award.image !== '';
+        const imgBlock = hasImg 
+          ? `<div class="achievement-img-wrapper" style="width: 80px; height: 80px; border-radius: 10px; overflow: hidden; flex-shrink: 0; background: rgba(255,255,255,0.02); border: 1px solid var(--jet); display: flex; align-items: center; justify-content: center;">
+               <img src="${award.image}" alt="${award.title}" style="width: 100%; height: 100%; object-fit: cover;">
+             </div>`
+          : `<div class="achievement-icon-wrapper" style="width: 80px; height: 80px; border-radius: 10px; background: rgba(255, 219, 112, 0.05); border: 1px solid rgba(255, 219, 112, 0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+               <ion-icon name="trophy-outline" style="font-size: 32px; color: var(--orange-yellow-crayola);"></ion-icon>
+             </div>`;
+
+        return `
+          <li class="achievement-item">
+            <div class="content-card" style="padding: 20px; border-radius: 14px; border: 1px solid var(--jet); background: var(--bg-gradient-jet); display: flex; gap: 15px; align-items: center; height: 100%;">
+              ${imgBlock}
+              <div class="achievement-content" style="flex-grow: 1;">
+                <span class="achievement-date" style="font-size: 11px; color: var(--orange-yellow-crayola); font-weight: var(--fw-500); display: block; margin-bottom: 4px;">${award.date || ''}</span>
+                <h4 class="h4 achievement-item-title" style="color: var(--white-1); margin-bottom: 4px; font-size: 16px;">${award.title}</h4>
+                <p class="achievement-text" style="color: var(--light-gray); font-size: 13px; line-height: 1.5; margin: 0;">${award.description || ''}</p>
+              </div>
+            </div>
+          </li>
+        `;
+      }).join('');
+    } else {
+      achievementsContainer.innerHTML = `
+        <li style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--light-gray-70);">
+          <p>No achievements added yet.</p>
+        </li>
+      `;
+    }
+  }
+
+  // Render Blogs list
+  const blogsContainer = document.getElementById('blogs-container');
+  if (blogsContainer) {
+    const publishedBlogs = (data.blogs || []).filter(post => post.status === 'published');
+    if (publishedBlogs.length > 0) {
+      blogsContainer.innerHTML = publishedBlogs.map(post => {
+        const hasImg = post.image && post.image !== '';
+        const tagsHtml = post.tags 
+          ? post.tags.split(',').map(tag => `<span class="blog-tag" style="background: rgba(255, 255, 255, 0.05); color: var(--light-gray); font-size: 10px; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--jet);">${tag.trim()}</span>`).join('')
+          : '';
+
+        // Strip HTML tag snippets for the card excerpt
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = post.content || '';
+        const plainText = tempDiv.textContent || tempDiv.innerText || '';
+        const excerpt = plainText.length > 100 ? plainText.substring(0, 100) + '...' : plainText;
+
+        return `
+          <li class="blog-post-item active" data-blog-index="${data.blogs.indexOf(post)}" style="cursor: pointer; display: flex; flex-direction: column; height: 100%;">
+            <div class="content-card" style="padding: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--jet); background: var(--bg-gradient-jet); display: flex; flex-direction: column; height: 100%; transition: all 0.3s ease;">
+              ${hasImg ? `
+                <div class="blog-img-wrapper" style="width: 100%; height: 150px; overflow: hidden;">
+                  <img src="${post.image}" alt="${post.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+              ` : ''}
+              <div class="blog-content" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between; flex-grow: 1;">
+                <div>
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 11px;">
+                    <time class="blog-date" style="color: var(--light-gray-70);">${post.date || ''}</time>
+                  </div>
+                  <h4 class="h4 blog-item-title" style="color: var(--white-1); line-height: 1.4; margin-bottom: 8px; font-size: 16px;">${post.title}</h4>
+                  <p class="blog-text" style="color: var(--light-gray); font-size: 13px; line-height: 1.5; margin-bottom: 12px;">${excerpt}</p>
+                </div>
+                <div>
+                  <div class="blog-tags-container" style="display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 15px;">
+                    ${tagsHtml}
+                  </div>
+                  <div class="blog-footer" style="display: flex; align-items: center; gap: 4px; color: var(--orange-yellow-crayola); font-weight: var(--fw-500); font-size: 13px;">
+                    <span>Read More</span>
+                    <ion-icon name="arrow-forward-outline" style="font-size: 14px;"></ion-icon>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </li>
+        `;
+      }).join('');
+    } else {
+      blogsContainer.innerHTML = `
+        <li style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--light-gray-70);">
+          <p>No blog posts published yet.</p>
+        </li>
+      `;
+    }
+  }
+
+  // Render GitHub Stats Cards
+  const githubStatsSection = document.getElementById('github-stats-section');
+  if (githubStatsSection && data.settings) {
+    const github = data.settings.github || {
+      username: "dakshitpatel27",
+      statsEnabled: true,
+      languagesEnabled: true,
+      theme: "dark"
+    };
+
+    const username = github.username ? github.username.trim() : '';
+    const statsEnabled = github.statsEnabled !== false;
+    const languagesEnabled = github.languagesEnabled !== false;
+    const theme = github.theme || 'dark';
+
+    if (username && (statsEnabled || languagesEnabled)) {
+      githubStatsSection.style.display = 'block';
+      const container = githubStatsSection.querySelector('.github-stats-cards');
+      if (container) {
+        let cardsHtml = '';
+        if (statsEnabled) {
+          cardsHtml += `<img src="https://github-readme-stats.vercel.app/api?username=${username}&show_icons=true&theme=${theme}" alt="GitHub Stats" class="github-stats-img" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--jet); padding: 5px; background: rgba(255, 255, 255, 0.02); height: auto;">`;
+        }
+        if (languagesEnabled) {
+          cardsHtml += `<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=${username}&layout=compact&theme=${theme}" alt="Top Languages" class="github-stats-img" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--jet); padding: 5px; background: rgba(255, 255, 255, 0.02); height: auto;">`;
+        }
+        container.innerHTML = cardsHtml;
+      }
+    } else {
+      githubStatsSection.style.display = 'none';
+    }
+  } else if (githubStatsSection) {
+    githubStatsSection.style.display = 'none';
+  }
+}
+
+let typingTimeout = null;
+function startRoleTypingAnimation(rolesList) {
+  if (typingTimeout) {
+    clearTimeout(typingTimeout);
+  }
+
+  const roleContainer = document.querySelector('.role-text-typing');
+  if (!roleContainer) return;
+  
+  let roleIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  let delay = 100;
+  
+  function type() {
+    const currentRole = rolesList[roleIndex];
+    if (!currentRole) return;
+
+    if (isDeleting) {
+      roleContainer.textContent = currentRole.substring(0, charIndex - 1);
+      charIndex--;
+      delay = 50;
+    } else {
+      roleContainer.textContent = currentRole.substring(0, charIndex + 1);
+      charIndex++;
+      delay = 100;
+    }
+    
+    if (!isDeleting && charIndex === currentRole.length) {
+      delay = 2000;
+      isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      roleIndex = (roleIndex + 1) % rolesList.length;
+      delay = 500;
+    }
+    
+    typingTimeout = setTimeout(type, delay);
+  }
+  
+  type();
 }
 
 // Run the renderer dynamically (fetches from Google Drive API if configured, otherwise falls back to local data.js)
@@ -503,11 +897,13 @@ let articlesContainer = null;
 let navigationLinks = [];
 let pages = [];
 
-const pageOrder = ['about', 'resume', 'portfolio', 'certifications', 'contact'];
+const pageOrder = ['about', 'resume', 'portfolio', 'achievements', 'blogs', 'certifications', 'contact'];
 const navMap = {
   'about': 'about',
   'resume': 'resume',
   'projects': 'portfolio',
+  'achievements': 'achievements',
+  'blog': 'blogs',
   'certifications': 'certifications',
   'contact': 'contact'
 };
@@ -671,22 +1067,24 @@ function initInteractiveElements() {
     }
   }
 
-  if (modalImg && modalTitle && modalText && testimonialsItem.length > 0) {
-    for (let i = 0; i < testimonialsItem.length; i++) {
-      testimonialsItem[i].addEventListener("click", function () {
-        const avatar = this.querySelector("[data-testimonials-avatar]");
-        const title = this.querySelector("[data-testimonials-title]");
-        const text = this.querySelector("[data-testimonials-text]");
-        if (avatar && title && text) {
-          modalImg.src = avatar.src;
-          modalImg.alt = avatar.alt;
-          modalTitle.innerHTML = title.innerHTML;
-          modalText.innerHTML = text.innerHTML;
-          testimonialsModalFunc();
-        }
-      });
+  // Event Delegation for Testimonials Click Modal
+  document.addEventListener("click", function (e) {
+    const item = e.target.closest("[data-testimonials-item]");
+    if (item) {
+      const avatar = item.querySelector("[data-testimonials-avatar]");
+      const title = item.querySelector("[data-testimonials-title]");
+      const company = item.querySelector(".testimonials-company");
+      const text = item.querySelector("[data-testimonials-text]");
+      if (avatar && title && text && modalImg && modalTitle && modalText) {
+        modalImg.src = avatar.src;
+        modalImg.alt = avatar.alt;
+        let subTitleText = company ? company.textContent.trim() : '';
+        modalTitle.innerHTML = title.textContent.trim() + (subTitleText ? `<br><span style="font-size:13px; color:var(--light-gray-70); font-weight:var(--fw-300);">${subTitleText}</span>` : '');
+        modalText.innerHTML = text.innerHTML;
+        testimonialsModalFunc();
+      }
     }
-  }
+  });
 
   if (modalCloseBtn) modalCloseBtn.addEventListener("click", testimonialsModalFunc);
   if (overlay) overlay.addEventListener("click", testimonialsModalFunc);
@@ -739,76 +1137,220 @@ function initInteractiveElements() {
     }
   }
 
-  // contact form variables
+  // contact form variables and dynamic rendering
   const form = document.querySelector("[data-form]");
-  const formInputs = document.querySelectorAll("[data-form-input]");
-  const formBtn = document.querySelector("[data-form-btn]");
+  if (form && window.portfolioData) {
+    const contactForm = window.portfolioData.settings?.contactForm || {
+      title: "Get in touch",
+      fields: [
+        { type: "text", name: "fullname", placeholder: "Full name", required: true },
+        { type: "email", name: "email", placeholder: "Email address", required: true },
+        { type: "tel", name: "phone", placeholder: "Phone number", required: false },
+        { type: "text", name: "subject", placeholder: "Subject", required: true },
+        { type: "textarea", name: "message", placeholder: "Your Message", required: true }
+      ]
+    };
 
-  // add event to all form input fields for live validation and handle background submit
-  if (form && formInputs.length > 0 && formBtn) {
-    for (let i = 0; i < formInputs.length; i++) {
-      formInputs[i].addEventListener("input", function () {
-        if (form.checkValidity()) {
-          formBtn.removeAttribute("disabled");
-        } else {
-          formBtn.setAttribute("disabled", "");
-        }
-      });
+    // Update form title if element exists
+    const formTitleEl = document.querySelector(".form-title");
+    if (formTitleEl) {
+      formTitleEl.textContent = contactForm.title || "Get in touch";
     }
 
-    form.addEventListener("submit", function (event) {
-      event.preventDefault();
+    let formHTML = '';
+    let currentGroup = [];
 
-      const originalBtnText = formBtn.innerHTML;
-      formBtn.innerHTML = `<span class="spinner"></span> Sending...`;
-      formBtn.setAttribute("disabled", "");
+    contactForm.fields.forEach((field) => {
+      const isFullWidth = field.type === 'textarea';
+      
+      const inputHTML = field.type === 'textarea' 
+        ? `<textarea name="${field.name}" class="form-input" placeholder="${field.placeholder}" ${field.required ? 'required' : ''} data-form-input></textarea>`
+        : `<input type="${field.type}" name="${field.name}" class="form-input" placeholder="${field.placeholder}" ${field.required ? 'required' : ''} data-form-input>`;
 
-      const fullname = form.querySelector('[name="fullname"]').value.trim();
-      const email = form.querySelector('[name="email"]').value.trim();
-      const phone = form.querySelector('[name="phone"]').value.trim();
-      const subject = form.querySelector('[name="subject"]').value.trim();
-      const message = form.querySelector('[name="message"]').value.trim();
-
-      const accessKey = "1fe4ef89-0663-48b3-92b0-e26621a864b1";
-
-      fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({
-          access_key: accessKey,
-          name: fullname,
-          email: email,
-          phone: phone,
-          subject: subject,
-          message: message
-        })
-      })
-      .then(async (response) => {
-        let json = await response.json();
-        if (response.status === 200) {
-          showToast("Your message has been sent successfully!");
-          form.reset();
-        } else {
-          showToast(json.message || "Failed to send message. Please try again.", "error");
+      if (isFullWidth) {
+        if (currentGroup.length > 0) {
+          formHTML += `<div class="input-wrapper">${currentGroup.join('')}</div>`;
+          currentGroup = [];
         }
-      })
-      .catch((error) => {
-        console.error(error);
-        showToast("Network error. Please try again later.", "error");
-      })
-      .then(() => {
-        formBtn.innerHTML = originalBtnText;
-        if (form.checkValidity()) {
-          formBtn.removeAttribute("disabled");
-        } else {
-          formBtn.setAttribute("disabled", "");
+        formHTML += inputHTML;
+      } else {
+        currentGroup.push(inputHTML);
+        if (currentGroup.length === 2) {
+          formHTML += `<div class="input-wrapper">${currentGroup.join('')}</div>`;
+          currentGroup = [];
         }
-      });
+      }
     });
+
+    if (currentGroup.length > 0) {
+      formHTML += `<div class="input-wrapper">${currentGroup.join('')}</div>`;
+    }
+
+    // Add submit button
+    formHTML += `
+      <button class="form-btn" type="submit" disabled data-form-btn>
+        <ion-icon name="paper-plane-outline"></ion-icon>
+        <span>Send Message</span>
+      </button>
+    `;
+
+    form.innerHTML = formHTML;
+
+    // Fetch elements again after rendering
+    const formInputs = form.querySelectorAll("[data-form-input]");
+    const formBtn = form.querySelector("[data-form-btn]");
+
+    if (formInputs.length > 0 && formBtn) {
+      for (let i = 0; i < formInputs.length; i++) {
+        formInputs[i].addEventListener("input", function () {
+          if (form.checkValidity()) {
+            formBtn.removeAttribute("disabled");
+          } else {
+            formBtn.setAttribute("disabled", "");
+          }
+        });
+      }
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const originalBtnText = formBtn.innerHTML;
+        formBtn.innerHTML = `<span class="spinner"></span> Sending...`;
+        formBtn.setAttribute("disabled", "");
+
+        const accessKey = (window.portfolioData && window.portfolioData.settings && window.portfolioData.settings.web3FormsKey) || "1fe4ef89-0663-48b3-92b0-e26621a864b1";
+        
+        // Dynamically build submit payload
+        const payload = {
+          access_key: accessKey
+        };
+        formInputs.forEach(input => {
+          const name = input.getAttribute("name");
+          if (name) {
+            payload[name] = input.value.trim();
+          }
+        });
+
+        // 1. Submit to Web3Forms
+        const web3formsPromise = fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload)
+        }).then(async (res) => {
+          const ok = res.ok;
+          const data = await res.json();
+          return { success: ok && data.success, message: data.message };
+        }).catch(err => ({ success: false, message: err.message }));
+
+        // 2. Submit to local inquiries logger endpoint
+        const localPromise = fetch("/api/submit-message", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            fullname: payload.fullname,
+            email: payload.email,
+            phone: payload.phone,
+            subject: payload.subject,
+            message: payload.message
+          })
+        }).then(async (res) => {
+          const ok = res.ok;
+          const data = await res.json();
+          return { success: ok && data.success, error: data.error };
+        }).catch(err => ({ success: false, error: err.message }));
+
+        Promise.allSettled([web3formsPromise, localPromise])
+        .then(([web3Result, localResult]) => {
+          const web3Success = web3Result.status === 'fulfilled' && web3Result.value.success;
+          const localSuccess = localResult.status === 'fulfilled' && localResult.value.success;
+
+          if (web3Success || localSuccess) {
+            showToast("Your message has been sent successfully!");
+            form.reset();
+          } else {
+            const errMsg = (web3Result.status === 'fulfilled' ? web3Result.value.message : null) || 
+                           (localResult.status === 'fulfilled' ? localResult.value.error : null) || 
+                           "Failed to send message. Please try again.";
+            showToast(errMsg, "error");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          showToast("Network error. Please try again later.", "error");
+        })
+        .then(() => {
+          formBtn.innerHTML = originalBtnText;
+          if (form.checkValidity()) {
+            formBtn.removeAttribute("disabled");
+          } else {
+            formBtn.setAttribute("disabled", "");
+          }
+        });
+      });
+    }
   }
+
+  // Event Delegation for Blog Modal Trigger
+  document.addEventListener("click", function (e) {
+    const blogItem = e.target.closest(".blog-post-item");
+    if (blogItem) {
+      const idx = parseInt(blogItem.getAttribute("data-blog-index"), 10);
+      if (window.portfolioData && window.portfolioData.blogs && window.portfolioData.blogs[idx]) {
+        const post = window.portfolioData.blogs[idx];
+        const modal = document.getElementById("blog-modal");
+        const modalImgContainer = document.getElementById("blog-modal-image-container");
+        const modalImg = document.getElementById("blog-modal-image");
+        const modalTitle = document.getElementById("blog-modal-title");
+        const modalDate = document.getElementById("blog-modal-date");
+        const modalTags = document.getElementById("blog-modal-tags");
+        const modalText = document.getElementById("blog-modal-text");
+        const overlay = document.querySelector("[data-blog-overlay]");
+
+        if (modal && modalTitle && modalDate && modalTags && modalText && overlay) {
+          modalTitle.textContent = post.title;
+          modalDate.textContent = post.date || '';
+          
+          if (post.image) {
+            modalImg.src = post.image;
+            modalImgContainer.style.display = 'block';
+          } else {
+            modalImgContainer.style.display = 'none';
+          }
+
+          if (post.tags) {
+            modalTags.innerHTML = post.tags.split(',').map(tag => `<span style="background: rgba(255, 255, 255, 0.05); color: var(--light-gray); font-size: 11px; padding: 3px 8px; border-radius: 4px; border: 1px solid var(--jet);">${tag.trim()}</span>`).join('');
+            modalTags.style.display = 'flex';
+          } else {
+            modalTags.style.display = 'none';
+          }
+
+          modalText.innerHTML = post.content || '';
+          
+          modal.classList.add("active");
+          overlay.classList.add("active");
+        }
+      }
+    }
+  });
+
+  // Blog Close Modal Trigger
+  const closeBlogBtn = document.querySelector("[data-blog-modal-close-btn]");
+  const blogOverlay = document.querySelector("[data-blog-overlay]");
+  const blogModalCloseFunc = function() {
+    const modal = document.getElementById("blog-modal");
+    const overlay = document.querySelector("[data-blog-overlay]");
+    if (modal && overlay) {
+      modal.classList.remove("active");
+      overlay.classList.remove("active");
+    }
+  };
+  if (closeBlogBtn) closeBlogBtn.addEventListener("click", blogModalCloseFunc);
+  if (blogOverlay) blogOverlay.addEventListener("click", blogModalCloseFunc);
 
   navigationLinks.forEach(btn => {
     btn.type = 'button';

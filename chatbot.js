@@ -15,6 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
     return;
   }
 
+  // Update custom chatbot title and subtitle immediately if available
+  const chatbotTitleEl = document.querySelector('.chatbot-title');
+  const chatbotSubtitleEl = document.querySelector('.chatbot-subtitle');
+  if (window.portfolioData && window.portfolioData.chatbot) {
+    if (window.portfolioData.chatbot.title && chatbotTitleEl) {
+      chatbotTitleEl.textContent = window.portfolioData.chatbot.title;
+    }
+    if (window.portfolioData.chatbot.subtitle && chatbotSubtitleEl) {
+      chatbotSubtitleEl.textContent = window.portfolioData.chatbot.subtitle;
+    }
+  }
+
   let isInitialized = false;
 
   // Toggle chatbot visibility
@@ -71,12 +83,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize welcome message and chips
   function initializeChat() {
     isInitialized = true;
-    renderChips(defaultSuggestions);
+    
+    // Suggestion chips
+    const chips = window.portfolioData?.chatbot?.suggestions || defaultSuggestions;
+    renderChips(chips);
     
     // Welcome message with user name if available
-    const name = window.portfolioData?.profile?.name || 'Dakshit';
-    const role = window.portfolioData?.profile?.role || 'Python Developer';
-    addBotMessage(`<p>Hi there! I am <strong>${name}'s</strong> AI assistant.</p><p>I can help answer questions about his skills, experience, projects, education, or how to contact him. What would you like to know?</p>`);
+    const welcomeHTML = window.portfolioData?.chatbot?.welcomeMessage || 
+      `<p>Hi there! I am <strong>${window.portfolioData?.profile?.name || 'Dakshit'}</strong>'s AI assistant.</p><p>I can help answer questions about his skills, experience, projects, education, or how to contact him. What would you like to know?</p>`;
+      
+    addBotMessage(welcomeHTML);
   }
 
   // Render suggestion chips
@@ -163,6 +179,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!data) {
       return `<p>I'm sorry, I couldn't load the portfolio data right now. Please try again later or reach out via email.</p>`;
+    }
+
+    // Custom Q&As Intent Matching
+    if (data.chatbot && Array.isArray(data.chatbot.customQAs)) {
+      for (let i = 0; i < data.chatbot.customQAs.length; i++) {
+        const qa = data.chatbot.customQAs[i];
+        if (qa && qa.keywords && qa.response) {
+          const keywordsList = qa.keywords.split(',').map(kw => kw.trim().toLowerCase()).filter(Boolean);
+          if (matchKeywords(cleanQuery, keywordsList)) {
+            return qa.response;
+          }
+        }
+      }
     }
 
     // Intent 1: Greeting

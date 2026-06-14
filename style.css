@@ -1553,7 +1553,7 @@ textarea.form-input::-webkit-resizer { display: none; }
 
   .navbar { border-radius: 20px 20px 0 0; }
 
-  .navbar-list { gap: 20px; }
+  .navbar-list { gap: 12px; }
 
   .navbar-link { --fs-8: 14px; }
 
@@ -1757,7 +1757,7 @@ textarea.form-input::-webkit-resizer { display: none; }
    * NAVBAR
    */
 
-  .navbar-link { --fs-8: 15px; }
+  .navbar-link { --fs-8: 14px; }
 
 
 
@@ -1902,13 +1902,14 @@ textarea.form-input::-webkit-resizer { display: none; }
   }
 
   .navbar-list {
-    gap: 10px;
+    gap: 6px;
     padding: 0;
   }
 
   .navbar-link {
     font-weight: var(--fw-500);
-    padding: 8px 16px;
+    font-size: 13px;
+    padding: 8px 12px;
     border-radius: 8px;
   }
 
@@ -2035,80 +2036,6 @@ textarea.form-input::-webkit-resizer { display: none; }
   }
 
   .social-list { justify-content: center; }
-  .certifications {
-    margin-top: 40px;
-  }
-  
- /***********************************************
- *  CERTIFICATIONS PAGE (FINAL FIXED VERSION)
- ***********************************************/
-
-article[data-page="certifications"] {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-
-  /* FIX: Prevent Android Chrome from forcing black text */
-  forced-color-adjust: none !important;
-  -webkit-text-fill-color: var(--white-2) !important;
-}
-
-/* Title Styling */
-.certifications .article-title {
-  font-size: 30px;
-  margin-bottom: 18px;
-  margin-top: 35px;
-  color: var(--white-2) !important;
-}
-
-/* List Wrapper */
-.certificate-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* LI Items */
-.certificate-list li {
-  margin-bottom: 18px;
-  font-size: 16px;
-  line-height: 1.5;
-
-  /* Text must remain white across all browsers */
-  color: var(--white-2) !important;
-  -webkit-text-fill-color: var(--white-2) !important;
-
-  /* Make sure Chrome mobile does NOT auto-adjust color */
-  forced-color-adjust: none !important;
-}
-
-/* Links */
-.certificate-list a {
-  display: inline-block;
-  margin-top: 4px;
-  font-weight: 600;
-  text-decoration: none;
-
-  color: #4da6ff !important;
-  -webkit-text-fill-color: #4da6ff !important;
-  forced-color-adjust: none !important;
-
-  transition: 0.2s ease;
-}
-
-.certificate-list a:hover {
-  color: #82c7ff !important;
-  -webkit-text-fill-color: #82c7ff !important;
-  text-decoration: underline;
-}
-
-/* Apply white color to all children safely */
-article[data-page="certifications"] * {
-  color: var(--white-2) !important;
-  -webkit-text-fill-color: var(--white-2) !important;
-  forced-color-adjust: none !important;
-}
-
-
 
   /**
 	 * RESUME
@@ -2116,18 +2043,6 @@ article[data-page="certifications"] * {
 
   .timeline-text { max-width: 700px; }
 
-}
-article[data-page="certifications"] * {
-  forced-color-adjust: none !important;
-  -webkit-text-fill-color: var(--white-2) !important;
-  color: var(--white-2) !important;
-}
-/* Make only "View Certificate" links blue */
-article[data-page="certifications"] .certificate-list a {
-  color: #4da6ff !important;
-  -webkit-text-fill-color: #4da6ff !important;
-  font-weight: 600;
-  text-decoration: none;
 }
 .info-content {
   background: transparent;
@@ -2161,6 +2076,7 @@ article[data-page="certifications"] .certificate-list a {
 
 .role span {
   color: var(--orange-yellow-crayola);
+  display: inline-block;
 }
 .with-logo {
   display: flex;
@@ -2841,4 +2757,10 @@ article[data-page="certifications"] .certificate-list a {
     width: calc(100% - 40px);
     height: 420px;
   }
+}
+
+/* Maintenance Mode Animation */
+@keyframes maintenance-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
 }
